@@ -1,0 +1,21 @@
+import mongoose from "mongoose";
+
+const inquirySchema = new mongoose.Schema({
+  idItem: String,
+  description: String,
+  brand: String,
+  type: String,
+  encap: String,
+  ipi: Number,
+  weight: Number,
+  note: String,
+  step: Number,
+  status: String,
+  quantity: Number,
+  unitPurchasePriceInCents: Number,
+  unitSalePriceInCents: Number,
+});
+
+const InquiryModel = mongoose.model("inquiry", inquirySchema);
+
+export default InquiryModel;
