@@ -39,7 +39,11 @@ export async function getSuppliersList(req, res) {
 }
 
 export async function getSupplierById(req, res) {
-  console.log("by id");
+  const { id } = req.body;
+
+  const supplier = await SupplierModel.findById(id);
+
+  return res.json(supplier);
 }
 
 export async function updateSupplier(req, res) {

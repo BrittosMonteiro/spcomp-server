@@ -31,6 +31,20 @@ export async function getTypeList(req, res) {
   return res.json(items);
 }
 
-export async function putType(req, res) {}
+export async function putType(req, res) {
+  const type = req.body;
 
-export async function deleteType(req, res) {}
+  const updateType = await TypeModel.findByIdAndUpdate(type.id, {
+    description: type.description,
+  });
+
+  return res.json(updateType);
+}
+
+export async function deleteType(req, res) {
+  const { id } = req.body;
+
+  const removeType = await TypeModel.findByIdAndDelete(id);
+
+  return res.json(removeType);
+}

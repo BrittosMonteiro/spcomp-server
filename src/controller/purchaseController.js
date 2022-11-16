@@ -60,10 +60,31 @@ export async function getPurchaseList(req, res) {
   return res.json(items);
 }
 
+export async function updateItemFromPurchaseList(req, res) {
+  const data = req.body;
+
+  const updateItem = await PurchaseItemModel.findByIdAndUpdate(data.id, {
+    idInquiry: data.id,
+    idItem: data.idItem,
+    description: data.description,
+    brand: data.brand,
+    type: data.type,
+    encap: data.encap,
+    ipi: data.ipi,
+    weight: data.weight,
+    note: data.note,
+    step: data.step,
+    status: data.status,
+    quantity: data.quantity,
+    unitPurchasePriceInCents: data.unitPurchasePrice * 100,
+    unitSalePriceInCents: data.unitSalePrice * 100,
+  });
+}
+
 export async function deleteItemFromPurchaseList(req, res) {
   const { id } = req.body;
-  console.log(id);
 
   const remove = await PurchaseItemModel.findByIdAndDelete(id);
+
   return res.send(remove);
 }

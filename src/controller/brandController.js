@@ -31,6 +31,20 @@ export async function getBrandList(req, res) {
   return res.json(items);
 }
 
-export async function putBrand(req, res) {}
+export async function putBrand(req, res) {
+  const brand = req.body;
 
-export async function deleteBrand(req, res) {}
+  const updateBrand = await BrandModel.findByIdAndUpdate(brand.id, {
+    description: brand.description,
+  });
+
+  return res.json(updateBrand);
+}
+
+export async function deleteBrand(req, res) {
+  const { id } = req.body;
+
+  const removeBrand = await BrandModel.findByIdAndDelete(id);
+
+  return res.json(removeBrand);
+}

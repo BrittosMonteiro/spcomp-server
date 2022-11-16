@@ -31,6 +31,20 @@ export async function getEncapList(req, res) {
   return res.json(items);
 }
 
-export async function putEncap(req, res) {}
+export async function putEncap(req, res) {
+  const encap = req.body;
 
-export async function deleteEncap(req, res) {}
+  const updateEncap = await EncapModel.findByIdAndUpdate(encap.id, {
+    description: encap.description,
+  });
+
+  return res.json(updateEncap);
+}
+
+export async function deleteEncap(req, res) {
+  const { id } = req.body;
+
+  const removeEncap = await EncapModel.findByIdAndDelete(id);
+
+  return res.json(removeEncap);
+}
