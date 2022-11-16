@@ -13,6 +13,8 @@ import StockRouter from "./src/routes/stock.js";
 import BrandRouter from "./src/routes/brand.js";
 import TypeRouter from "./src/routes/type.js";
 import EncapRouter from "./src/routes/encap.js";
+import UserRouter from "./src/routes/users.js";
+import LoginRouter from "./src/routes/login.js";
 
 const app = express();
 
@@ -26,6 +28,8 @@ app.use("/stock", StockRouter);
 app.use("/brand", BrandRouter);
 app.use("/type", TypeRouter);
 app.use("/encap", EncapRouter);
+app.use("/users", UserRouter);
+app.use("/login", LoginRouter);
 
 try {
   mongoose.connect(`${CONNECT}/${CONNECTDB}`);
