@@ -10,6 +10,7 @@ export async function createUser(req, res) {
     email: data.email,
     password: data.password,
     status: true,
+    isAdmin: data.isAdmin || false,
   });
 
   const create = await userModel.save();
@@ -20,19 +21,22 @@ export async function createUser(req, res) {
 export async function getUsersList(req, res) {
   let usersList = [];
 
-  await UserModel.find().then((docs) => {
-    for (let doc of docs) {
-      const user = {
-        name: doc.name,
-        surname: doc.surname,
-        username: doc.username,
-        email: doc.email,
-        status: doc.status,
-        id: doc._id,
-      };
-      usersList.push(user);
-    }
-  });
+  await UserModel.find()
+    .sort({ name: "asc" })
+    .then((docs) => {
+      for (let doc of docs) {
+        const user = {
+          name: doc.name,
+          surname: doc.surname,
+          username: doc.username,
+          email: doc.email,
+          status: doc.status,
+          isAdmin: doc.isAdmin,
+          id: doc._id,
+        };
+        usersList.push(user);
+      }
+    });
 
   return res.json(usersList);
 }
@@ -55,6 +59,7 @@ export async function updateUser(req, res) {
     email: data.email,
     password: data.password,
     status: data.status,
+    isAdmin: data.isAdmin,
   });
 
   return res.json(update);

@@ -15,6 +15,7 @@ import TypeRouter from "./src/routes/type.js";
 import EncapRouter from "./src/routes/encap.js";
 import UserRouter from "./src/routes/users.js";
 import LoginRouter from "./src/routes/login.js";
+import SupplierRoute from "./src/routes/supplier.js";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/type", TypeRouter);
 app.use("/encap", EncapRouter);
 app.use("/users", UserRouter);
 app.use("/login", LoginRouter);
+app.use("/supplier", SupplierRoute);
 
 try {
   mongoose.connect(`${CONNECT}/${CONNECTDB}`);
