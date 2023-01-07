@@ -5,6 +5,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 const CONNECT = process.env.MONGO_CONNECT;
 const CONNECTDB = process.env.MONGO_DB;
+const PORT = process.env.PORT || 5050;
 
 import item from "./src/routes/item.js";
 import inquiry from "./src/routes/inquiry.js";
@@ -41,4 +42,4 @@ try {
   console.log(err);
 }
 
-app.listen(3001);
+app.listen(PORT);
