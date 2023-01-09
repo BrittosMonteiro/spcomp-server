@@ -8,6 +8,7 @@ const userSchama = new mongoose.Schema({
   password: String,
   status: Boolean,
   isAdmin: Boolean,
+  role: Number,
 });
 
 const UserModel = mongoose.model("user", userSchama);

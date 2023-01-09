@@ -9,6 +9,10 @@ export async function createSupplier(req, res) {
     email: supplier.email,
     status: supplier.status,
     observation: supplier.observation,
+    password: supplier.password,
+    role: 4,
+    isAdmin: false,
+    username: supplier.username,
   });
 
   const create = await supplierModel.save();
@@ -65,4 +69,24 @@ export async function removeSupplier(req, res) {
   const removeSupplier = await SupplierModel.findByIdAndDelete(id);
 
   return res.json(removeSupplier);
+}
+
+export async function loginSupplier(req, res) {
+  const data = req.body;
+
+  const getSupplierLogin = await SupplierModel.findOne()
+    .where("username")
+    .equals(data.username);
+
+  if (getSupplierLogin && getSupplierLogin.password === data.password) {
+    const data = {
+      username: getSupplierLogin.username,
+      isAdmin: getSupplierLogin.isAdmin,
+      token: getSupplierLogin._id,
+      role: getSupplierLogin.role,
+    };
+    return res.json({ data, status: 200 });
+  }
+
+  return res.json({ status: 404 });
 }

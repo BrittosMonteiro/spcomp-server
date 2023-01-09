@@ -12,6 +12,7 @@ export async function Login(req, res) {
       username: getUserLogin.username,
       isAdmin: getUserLogin.isAdmin,
       token: getUserLogin._id,
+      role: getUserLogin.role,
     };
     return res.json({ data, status: 200 });
   }
