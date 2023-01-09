@@ -1,4 +1,4 @@
-import ItemModel from "../model/Item.js";
+import ItemModel from "../model/ItemModel.js";
 
 export async function createItem(req, res) {
   const data = req.body;

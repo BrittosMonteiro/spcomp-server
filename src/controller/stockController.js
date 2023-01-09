@@ -1,4 +1,4 @@
-import StockModel from "../model/stock.js";
+import StockModel from "../model/stockModel.js";
 
 export async function postStockItem(req, res) {
   const data = req.body;

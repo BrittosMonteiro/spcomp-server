@@ -1,4 +1,4 @@
-import CustomerModel from "../model/customer.js";
+import CustomerModel from "../model/customerModel.js";
 
 export async function createCustomer(req, res) {
   const customer = req.body;

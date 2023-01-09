@@ -1,4 +1,6 @@
-import InquiryModel from "../model/Inquiry.js";
+import InquiryModel from "../model/InquiryModel.js";
+import SupplierModel from "../model/supplierModel.js";
+import SupplierInquiryModel from "../model/supplierInquiry.js";
 
 export async function addItemToInquiryList(req, res) {
   const data = req.body;
@@ -89,3 +91,52 @@ export async function deleteItemFromInquiryList(req, res) {
 
 export async function updateItemStatus(req, res) {}
 export async function deleteAllItemsFromInquiryList(req, res) {}
+
+export async function setInquiryList(req, res) {
+  const data = req.body;
+
+  return res.json(data);
+}
+
+export async function getInquiryList(req, res) {
+  const { idCompany } = req.body;
+  let inquiries = [];
+  let companyItems = [];
+
+  const newLists = await SupplierInquiryModel.find()
+    .where("status")
+    .equals(true);
+
+  for (let list of newLists) {
+    const data = {
+      id: list._id,
+      title: list.title,
+      items: [],
+    };
+
+    const filteredList = list.suppliers.filter(
+      (supplier) => supplier.idCompany === idCompany
+    );
+
+    for (let list of filteredList) {
+      data.items = list.items;
+    }
+    inquiries.push(data);
+  }
+
+  return res.json(inquiries);
+}
+
+export async function updateInquiryList(req, res) {
+  const data = req.body;
+  let inquiryList = [];
+
+  inquiryList = await SupplierInquiryModel.findById(data.inquiryId);
+  let newList = inquiryList.suppliers.filter(
+    (supplier) => supplier.idCompany === data.supplierId
+  );
+
+  let item = newList.items;
+
+  console.log(item);
+}

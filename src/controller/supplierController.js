@@ -1,4 +1,4 @@
-import SupplierModel from "../model/supplier.js";
+import SupplierModel from "../model/supplierModel.js";
 
 export async function createSupplier(req, res) {
   const supplier = req.body;

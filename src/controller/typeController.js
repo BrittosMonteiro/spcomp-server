@@ -1,4 +1,4 @@
-import TypeModel from "../model/type.js";
+import TypeModel from "../model/typeModel.js";
 
 export async function postType(req, res) {
   const data = req.body;

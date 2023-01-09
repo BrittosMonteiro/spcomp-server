@@ -1,4 +1,4 @@
-import BrandModel from "../model/brand.js";
+import BrandModel from "../model/brandModel.js";
 
 export async function postBrand(req, res) {
   const data = req.body;

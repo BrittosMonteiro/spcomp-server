@@ -1,4 +1,4 @@
-import EncapModel from "../model/encap.js";
+import EncapModel from "../model/encapModel.js";
 
 export async function postEncap(req, res) {
   const data = req.body;

@@ -1,4 +1,4 @@
-import PurchaseItemModel from "../model/purchase.js";
+import PurchaseItemModel from "../model/purchaseModel.js";
 
 export async function addItemToPurchaseList(req, res) {
   const data = req.body;
