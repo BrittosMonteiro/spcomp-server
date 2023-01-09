@@ -1,6 +1,7 @@
 import InquiryModel from "../model/InquiryModel.js";
 import SupplierModel from "../model/supplierModel.js";
-import SupplierInquiryModel from "../model/supplierInquiry.js";
+import SupplierInquiryModel from "../model/supplierInquiryModel.js";
+import InquiryHistoryModel from "../model/inquiryHistoryModel.js";
 
 export async function addItemToInquiryList(req, res) {
   const data = req.body;
@@ -94,34 +95,91 @@ export async function deleteAllItemsFromInquiryList(req, res) {}
 
 export async function setInquiryList(req, res) {
   const data = req.body;
+  let suppliersList = [];
+  let status = null;
 
-  return res.json(data);
+  await SupplierModel.find()
+    .then((docs) => {
+      for (let doc of docs) {
+        const supplier = {
+          supplierId: doc._id.toString(),
+          supplierName: doc.name,
+        };
+        suppliersList.push(supplier);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  const inquiryHistoryModal = new InquiryHistoryModel({
+    title: data.title,
+    status: true,
+  });
+
+  const createInquiryHistory = await inquiryHistoryModal.save();
+
+  if (createInquiryHistory) {
+    for (let supplier of suppliersList) {
+      const supplierInquiryModel = new SupplierInquiryModel({
+        idInquiryHistory: createInquiryHistory._id.toString(),
+        idSupplier: supplier.supplierId,
+        nameSupplier: supplier.supplierName,
+        items: data.items,
+      });
+
+      const createSupplierInquiry = await supplierInquiryModel.save();
+
+      if (createSupplierInquiry) {
+        status = { status: 200 };
+      } else {
+        status = { status: 404 };
+      }
+    }
+  }
+  return res.json(status);
 }
 
-export async function getInquiryList(req, res) {
+export async function getInquiryListByCompany(req, res) {
   const { idCompany } = req.body;
-  let inquiries = [];
-  let companyItems = [];
+  const inquiryHistory = [];
+  const inquiries = [];
 
-  const newLists = await SupplierInquiryModel.find()
+  await InquiryHistoryModel.find()
     .where("status")
-    .equals(true);
+    .equals(true)
+    .then((docs) => {
+      for (let doc of docs) {
+        const history = {
+          id: doc._id,
+          title: doc.title,
+        };
+        inquiryHistory.push(history);
+      }
+    });
 
-  for (let list of newLists) {
-    const data = {
-      id: list._id,
-      title: list.title,
-      items: [],
-    };
-
-    const filteredList = list.suppliers.filter(
-      (supplier) => supplier.idCompany === idCompany
-    );
-
-    for (let list of filteredList) {
-      data.items = list.items;
+  if (inquiryHistory) {
+    for (let history of inquiryHistory) {
+      let data = {
+        ...history,
+      };
+      await SupplierInquiryModel.find()
+        .where("idInquiryHistory")
+        .equals(history.id)
+        .where("idSupplier")
+        .equals(idCompany)
+        .then((docs) => {
+          for (let doc of docs) {
+            data = {
+              ...data,
+              idSupplier: doc.idSupplier,
+              nameSupplier: doc.nameSupplier,
+              items: doc.items,
+            };
+            inquiries.push(data);
+          }
+        });
     }
-    inquiries.push(data);
   }
 
   return res.json(inquiries);

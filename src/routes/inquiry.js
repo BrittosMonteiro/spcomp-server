@@ -8,7 +8,7 @@ import {
   deleteItemFromInquiryList,
   getAllItemsFromInquiryList,
   setInquiryList,
-  getInquiryList,
+  getInquiryListByCompany,
   updateInquiryList,
 } from "../controller/inquiryController.js";
 
@@ -24,7 +24,7 @@ Router.delete("/deleteAll", deleteAllItemsFromInquiryList);
 
 Router.post("/setInquiryList", setInquiryList);
 
-Router.post("/getInquiryList", getInquiryList);
+Router.post("/getInquiryListByCompany", getInquiryListByCompany);
 
 Router.put("/updateInquiryList", updateInquiryList)
 
