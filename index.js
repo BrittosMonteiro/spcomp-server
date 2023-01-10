@@ -8,7 +8,9 @@ const CONNECTDB = process.env.MONGO_DB;
 const PORT = process.env.PORT || 5050;
 
 import item from "./src/routes/item.js";
-import inquiry from "./src/routes/inquiry.js";
+import InquiryItemRouter from "./src/routes/inquiryItemRouter.js";
+import inquiryHistoryRouter from "./src/routes/inquiryHistoryRouter.js";
+import InquiryListRouter from "./src/routes/inquiryListRouter.js";
 import purchase from "./src/routes/purchase.js";
 import StockRouter from "./src/routes/stock.js";
 import BrandRouter from "./src/routes/brand.js";
@@ -25,7 +27,9 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/item", item);
-app.use("/inquiry", inquiry);
+app.use("/inquiryItem", InquiryItemRouter);
+app.use("/inquiryHistory", inquiryHistoryRouter);
+app.use("/inquiryList", InquiryListRouter);
 app.use("/purchase", purchase);
 app.use("/stock", StockRouter);
 app.use("/brand", BrandRouter);
