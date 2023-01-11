@@ -80,6 +80,22 @@ export async function updateInquiryItem(req, res) {
   return res.send(update);
 }
 
+export async function updateInquiryItemPrice(req, res) {
+  const { idInquiryItem, unitSalePrice } = req.body;
+
+  await InquiryModel.findByIdAndUpdate(idInquiryItem, {
+    unitSalePriceInCents: unitSalePrice * 100,
+  })
+    .then(() => {
+      return res.json({ status: 200 });
+    })
+    .catch(() => {
+      return res.json({ status: 404 });
+    });
+
+  return;
+}
+
 export async function deleteInquiryItem(req, res) {
   const { id } = req.body;
 
