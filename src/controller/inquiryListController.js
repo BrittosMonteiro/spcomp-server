@@ -34,8 +34,18 @@ export async function readInquiryList(req, res) {
   await SupplierInquiryModel.find()
     .where("idInquiryHistory")
     .equals(idInquiryHistory)
-    .then((response) => {
-      return res.json({ response, status: 200 });
+    .then((docs) => {
+      for (let doc of docs) {
+        const data = {
+          idInquiryList: doc._id.toString(),
+          idInquiryHistory,
+          idSupplier: doc.idSupplier,
+          nameSupplier: doc.nameSupplier,
+          items: doc.items,
+        };
+        inquiryList.push(data);
+      }
+      return res.json({ inquiryList, status: 200 });
     })
     .catch((err) => {
       return res.json({ errorMessage: err, status: 404 });
@@ -51,13 +61,16 @@ export async function readInquiryListByCompany(req, res) {
     .equals(idInquiryHistory)
     .where("idSupplier")
     .equals(idSupplier)
-    .then((response) => {
+    .then((doc) => {
       const data = {
-        idInquiryList: response._id.toString(),
-        status: 200,
+        idInquiryList: doc._id.toString(),
+        idInquiryHistory,
+        idSupplier: doc.idSupplier,
+        nameSupplier: doc.nameSupplier,
+        items: doc.items,
       };
-      inquiryList = response.items;
-      return res.json({ ...data, inquiryList });
+      inquiryList.push(data);
+      return res.json({ inquiryList, status: 200 });
     })
     .catch((err) => {
       return res.json({ errorMessage: err, status: 404 });
