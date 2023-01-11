@@ -5,6 +5,7 @@ import {
   createInquiryList,
   readInquiryList,
   readInquiryListByCompany,
+  readSingleItemFromInquiryList,
   updateInquiryList,
   deleteInquiryList,
 } from "../controller/inquiryListController.js";
@@ -15,6 +16,7 @@ InquiryListRouter.get(
   "/listByCompany/:idInquiryHistory/:idSupplier",
   readInquiryListByCompany
 );
+InquiryListRouter.get("/single/:idInquiryItem", readSingleItemFromInquiryList);
 InquiryListRouter.put("/", updateInquiryList);
 InquiryListRouter.delete("/", deleteInquiryList);
 

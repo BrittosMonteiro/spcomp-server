@@ -77,6 +77,36 @@ export async function readInquiryListByCompany(req, res) {
     });
 }
 
+export async function readSingleItemFromInquiryList(req, res) {
+  const { idInquiryItem } = req.params;
+  let inquiryList = [];
+
+  await SupplierInquiryModel.find()
+    .where("item.id")
+    .equals(idInquiryItem)
+    .then((docs) => {
+      for (let doc of docs) {
+        const data = {
+          idInquiryList: doc._id.toString(),
+          idInquiryHistory: doc.idInquiryHistory,
+          idSupplier: doc.idSupplier,
+          nameSupplier: doc.nameSupplier,
+          item: "",
+        };
+        data.item = doc.items.filter((item) => item.id === idInquiryItem);
+
+        if (data.item.length > 0) {
+          inquiryList.push(data);
+        }
+      }
+      return res.json({ inquiryList, status: 200 });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.json({ errorMessage: err, status: 404 });
+    });
+}
+
 export async function updateInquiryList(req, res) {
   const { idInquiryList, idItem, unitPrice } = req.body;
 
