@@ -82,7 +82,7 @@ export async function readSingleItemFromInquiryList(req, res) {
   let inquiryList = [];
 
   await SupplierInquiryModel.find()
-    .where("item.id")
+    .where("item.idInquiryItem")
     .equals(idInquiryItem)
     .then((docs) => {
       for (let doc of docs) {
@@ -93,7 +93,9 @@ export async function readSingleItemFromInquiryList(req, res) {
           nameSupplier: doc.nameSupplier,
           item: "",
         };
-        data.item = doc.items.filter((item) => item.id === idInquiryItem);
+        data.item = doc.items.filter(
+          (item) => item.idInquiryItem === idInquiryItem
+        );
 
         if (data.item.length > 0) {
           inquiryList.push(data);
@@ -108,14 +110,14 @@ export async function readSingleItemFromInquiryList(req, res) {
 }
 
 export async function updateInquiryList(req, res) {
-  const { idInquiryList, idItem, unitPrice } = req.body;
+  const { idInquiryList, idItem, unitPurchasePrice } = req.body;
 
   let document = await SupplierInquiryModel.findById(idInquiryList);
 
   if (document) {
     let index = document.items.findIndex((e) => e.idItem === idItem);
     let newItem = document.items[index];
-    newItem.unitSalePrice = unitPrice;
+    newItem.unitPurchasePrice = unitPurchasePrice;
 
     await SupplierInquiryModel.findByIdAndUpdate(idInquiryList, document)
       .then(() => {

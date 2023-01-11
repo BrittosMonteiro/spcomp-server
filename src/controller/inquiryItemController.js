@@ -81,9 +81,10 @@ export async function updateInquiryItem(req, res) {
 }
 
 export async function updateInquiryItemPrice(req, res) {
-  const { idInquiryItem, unitSalePrice } = req.body;
+  const { idInquiryItem, unitPurchasePrice, unitSalePrice } = req.body;
 
   await InquiryModel.findByIdAndUpdate(idInquiryItem, {
+    unitPurchasePriceInCents: unitPurchasePrice * 100,
     unitSalePriceInCents: unitSalePrice * 100,
   })
     .then(() => {
