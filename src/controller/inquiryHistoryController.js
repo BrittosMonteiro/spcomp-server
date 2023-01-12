@@ -30,7 +30,7 @@ export async function readInquiryHistory(req, res) {
           title: doc.title,
           status: doc.status,
         };
-        inquiryHistoryList.push(history);
+        inquiryHistoryList.unshift(history);
       }
 
       return res.json({ data: inquiryHistoryList, status: 200 });
@@ -52,7 +52,7 @@ export async function readActiveInquiryHistory(req, res) {
           id: doc._id,
           title: doc.title,
         };
-        inquiryHistoryList.push(history);
+        inquiryHistoryList.unshift(history);
       }
 
       return res.json({ data: inquiryHistoryList, status: 200 });

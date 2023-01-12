@@ -55,7 +55,7 @@ export async function readInquiryItems(req, res) {
           idUser: doc.idUser,
           nameUser: doc.nameUser,
         };
-        items.push(data);
+        items.unshift(data);
       }
     })
     .catch((err) => {

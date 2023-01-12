@@ -43,7 +43,7 @@ export async function readInquiryList(req, res) {
           nameSupplier: doc.nameSupplier,
           items: doc.items,
         };
-        inquiryList.push(data);
+        inquiryList.unshift(data);
       }
       return res.json({ inquiryList, status: 200 });
     })
@@ -69,7 +69,7 @@ export async function readInquiryListByCompany(req, res) {
         nameSupplier: doc.nameSupplier,
         items: doc.items,
       };
-      inquiryList.push(data);
+      inquiryList.unshift(data);
       return res.json({ inquiryList, status: 200 });
     })
     .catch((err) => {
@@ -98,7 +98,7 @@ export async function readSingleItemFromInquiryList(req, res) {
         );
 
         if (data.item.length > 0) {
-          inquiryList.push(data);
+          inquiryList.unshift(data);
         }
       }
       return res.json({ inquiryList, status: 200 });

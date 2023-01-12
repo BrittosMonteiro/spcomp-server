@@ -50,7 +50,7 @@ export async function getStockItemList(req, res) {
           unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
           unitSalePrice: doc.unitSalePriceInCents / 100,
         };
-        items.push(data);
+        items.unshift(data);
       }
     })
     .catch((err) => {

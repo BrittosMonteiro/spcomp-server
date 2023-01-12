@@ -32,7 +32,7 @@ export async function getAllItems(req, res) {
           weight: r.weight,
           note: r.note,
         };
-        items.push(data);
+        items.unshift(data);
       }
     })
     .catch((err) => {
