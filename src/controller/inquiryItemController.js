@@ -21,7 +21,8 @@ export async function createInquiryItem(req, res) {
     quantity: data.quantity,
     unitPurchasePriceInCents: data.unitPurchasePrice * 100,
     unitSalePriceInCents: data.unitSalePrice * 100,
-    idUser: "",
+    idUser: data.idUser,
+    nameUser: data.nameUser,
     idSupplier: "",
     nameSupplier: "",
   });
@@ -51,6 +52,8 @@ export async function readInquiryItems(req, res) {
           quantity: doc.quantity,
           unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
           unitSalePrice: doc.unitSalePriceInCents / 100,
+          idUser: doc.idUser,
+          nameUser: doc.nameUser,
         };
         items.push(data);
       }
