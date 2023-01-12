@@ -1,16 +1,17 @@
 import UserModel from "../model/userModel.js";
 
 export async function createUser(req, res) {
-  const data = req.body;
+  const { name, surname, status, role } = req.body;
 
   const userModel = new UserModel({
-    name: data.name,
-    surname: data.surname,
-    username: `${data.name.toLowerCase()}.${data.surname.toLowerCase()}`,
-    email: data.email,
-    password: data.password,
-    status: true,
-    isAdmin: data.isAdmin || false,
+    name: name,
+    surname: surname,
+    username: `${name.toLowerCase()}.${surname.toLowerCase()}`,
+    email: `${name.toLowerCase()}.${surname.toLowerCase()}@spcomponentes.com.br`,
+    password: "teste123",
+    status: status,
+    isAdmin: role === 1 || false,
+    role: role,
   });
 
   const create = await userModel.save();
@@ -32,7 +33,8 @@ export async function getUsersList(req, res) {
           email: doc.email,
           status: doc.status,
           isAdmin: doc.isAdmin,
-          id: doc._id,
+          id: doc._id.toString(),
+          role: doc.role,
         };
         usersList.push(user);
       }

@@ -110,12 +110,14 @@ export async function readSingleItemFromInquiryList(req, res) {
 }
 
 export async function updateInquiryList(req, res) {
-  const { idInquiryList, idItem, unitPurchasePrice } = req.body;
+  const { idInquiryList, idInquiryItem, unitPurchasePrice } = req.body;
 
   let document = await SupplierInquiryModel.findById(idInquiryList);
 
   if (document) {
-    let index = document.items.findIndex((e) => e.idItem === idItem);
+    let index = document.items.findIndex(
+      (e) => e.idInquiryItem === idInquiryItem
+    );
     let newItem = document.items[index];
     newItem.unitPurchasePrice = unitPurchasePrice;
 
