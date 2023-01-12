@@ -15,6 +15,8 @@ const inquirySchema = new mongoose.Schema({
   quantity: Number,
   unitPurchasePriceInCents: Number,
   unitSalePriceInCents: Number,
+  idSupplier: String,
+  nameSupplier: String,
 });
 
 const InquiryModel = mongoose.model("inquiry", inquirySchema);

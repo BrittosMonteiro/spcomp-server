@@ -21,6 +21,9 @@ export async function createInquiryItem(req, res) {
     quantity: data.quantity,
     unitPurchasePriceInCents: data.unitPurchasePrice * 100,
     unitSalePriceInCents: data.unitSalePrice * 100,
+    idUser: "",
+    idSupplier: "",
+    nameSupplier: "",
   });
 
   const create = await inquiryModel.save();
@@ -81,11 +84,19 @@ export async function updateInquiryItem(req, res) {
 }
 
 export async function updateInquiryItemPrice(req, res) {
-  const { idInquiryItem, unitPurchasePrice, unitSalePrice } = req.body;
+  const {
+    idInquiryItem,
+    unitPurchasePrice,
+    unitSalePrice,
+    idSupplier,
+    nameSupplier,
+  } = req.body;
 
   await InquiryModel.findByIdAndUpdate(idInquiryItem, {
     unitPurchasePriceInCents: unitPurchasePrice * 100,
     unitSalePriceInCents: unitSalePrice * 100,
+    idSupplier: idSupplier,
+    nameSupplier: nameSupplier,
   })
     .then(() => {
       return res.json({ status: 200 });
