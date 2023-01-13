@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 
 const purchaseItemSchema = new mongoose.Schema({
-  idInquiry: String,
+  idItemInuiry: String,
   idItem: String,
+  idUser: String,
   description: String,
   brand: String,
   type: String,
@@ -15,6 +16,11 @@ const purchaseItemSchema = new mongoose.Schema({
   quantity: Number,
   unitPurchasePriceInCents: Number,
   unitSalePriceInCents: Number,
+  idSupplier: String,
+  nameSupplier: String,
+  nameUser: String,
+  idCustomer: String,
+  nameCustomer: String,
 });
 
 const PurchaseItemModel = mongoose.model("purchase", purchaseItemSchema);

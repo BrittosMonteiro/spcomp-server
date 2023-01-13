@@ -1,6 +1,6 @@
 import PurchaseItemModel from "../model/purchaseModel.js";
 
-export async function addItemToPurchaseList(req, res) {
+export async function createPurchaseItem(req, res) {
   const data = req.body;
 
   if (data.unitPrice) {
@@ -28,7 +28,7 @@ export async function addItemToPurchaseList(req, res) {
   return res.send(create);
 }
 
-export async function getPurchaseList(req, res) {
+export async function readPurchaseList(req, res) {
   let items = [];
 
   await PurchaseItemModel.find()
@@ -60,7 +60,9 @@ export async function getPurchaseList(req, res) {
   return res.json(items);
 }
 
-export async function updateItemFromPurchaseList(req, res) {
+export async function readPurchaseItem(req, res) {}
+
+export async function updatePurchaseItem(req, res) {
   const data = req.body;
 
   const updateItem = await PurchaseItemModel.findByIdAndUpdate(data.id, {
@@ -81,7 +83,7 @@ export async function updateItemFromPurchaseList(req, res) {
   });
 }
 
-export async function deleteItemFromPurchaseList(req, res) {
+export async function deletePurchaseItem(req, res) {
   const { id } = req.body;
 
   const remove = await PurchaseItemModel.findByIdAndDelete(id);
