@@ -61,8 +61,6 @@ export async function updateEncap(req, res) {
     .catch((err) => {
       return res.status(200).json({ errorMessage: err.message });
     });
-
-  return res.json(updateEncap);
 }
 
 export async function deleteEncap(req, res) {

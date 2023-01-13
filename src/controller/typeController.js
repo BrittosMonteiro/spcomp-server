@@ -61,8 +61,6 @@ export async function updateType(req, res) {
     .catch((err) => {
       return res.status(404).json({ errorMessage: err.message });
     });
-
-  return res.json(updateType);
 }
 
 export async function deleteType(req, res) {
