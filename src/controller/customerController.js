@@ -3,29 +3,63 @@ import CustomerModel from "../model/customerModel.js";
 export async function createCustomer(req, res) {
   const customer = req.body;
 
-  const customerModel = new CustomerModel({
-    name: customer.name,
-    cnpj: customer.cnpj,
-    contact: customer.contact,
-    email: customer.email,
-    phone: customer.phone,
-    status: customer.status,
-  });
-
-  const create = await customerModel.save();
-
-  return res.send(create);
+  await new CustomerModel(customer)
+    .save()
+    .then((response) => {
+      if (response) {
+        return res.status(201).json({
+          message: "Customer created",
+        });
+      } else {
+        return res.status(404).json({
+          errorMessage: "Customer could not be created",
+        });
+      }
+    })
+    .catch((err) => {
+      return res.status(404).json({ errorMessage: err });
+    });
 }
 
-export async function getCustomersList(req, res) {
+export async function readCustomers(req, res) {
   let customersList = [];
 
   await CustomerModel.find()
     .sort({ name: "asc" })
     .then((docs) => {
-      for (let doc of docs) {
-        const customer = {
-          id: doc._id,
+      if (docs) {
+        for (let doc of docs) {
+          const customer = {
+            id: doc._id.toString(),
+            name: doc.name,
+            cnpj: doc.cnpj,
+            contact: doc.contact,
+            email: doc.email,
+            phone: doc.phone,
+            status: doc.status,
+          };
+          customersList.push(customer);
+        }
+        return res.status(200).json({ data: customersList });
+      } else {
+        return res
+          .status(404)
+          .json({ errorMessage: "Customer could not be loaded" });
+      }
+    })
+    .catch((err) => {
+      return res.status(404).json({ errorMessage: err.message });
+    });
+}
+
+export async function readCustomerById(req, res) {
+  const { idCustomer } = req.params;
+
+  await CustomerModel.findById(idCustomer)
+    .then((doc) => {
+      if (doc) {
+        const data = {
+          id: idCustomer,
           name: doc.name,
           cnpj: doc.cnpj,
           contact: doc.contact,
@@ -33,59 +67,74 @@ export async function getCustomersList(req, res) {
           phone: doc.phone,
           status: doc.status,
         };
-        customersList.push(customer);
+        return res.status(200).json({ data });
+      } else {
+        return res.status(404).json({ errorMessage: "Customer not found" });
       }
     })
     .catch((err) => {
-      console.log(err);
+      return res.status(404).json({ errorMessage: err.message });
     });
-
-  return res.json(customersList);
 }
 
-export async function getCustomerById(req, res) {
-  const { id } = req.body;
+export async function readCustomerToItem(req, res) {
+  let customersList = [];
 
-  const customer = await CustomerModel.findById(id)
-    .then((doc) => {
-      const data = {
-        id: doc._id,
-        name: doc.name,
-        cnpj: doc.cnpj,
-        contact: doc.contact,
-        email: doc.email,
-        phone: doc.phone,
-        status: doc.status,
-      };
-
-      return data;
+  await CustomerModel.find()
+    .where("status")
+    .equals(true)
+    .sort({ name: "asc" })
+    .then((docs) => {
+      if (docs) {
+        for (let doc of docs) {
+          const customer = {
+            id: doc._id.toString(),
+            name: doc.name,
+          };
+          customersList.push(customer);
+        }
+        return res.status(200).json({ data: customersList });
+      } else {
+        return res
+          .status(404)
+          .json({ errorMessage: "Customers could not be loaded" });
+      }
     })
     .catch((err) => {
-      console.log(err);
+      return res.status(404).send(err);
     });
-
-  return res.json(customer);
 }
 
 export async function updateCustomer(req, res) {
-  const customer = req.body;
+  const { idCustomer, data } = req.body;
 
-  const updateCustomer = await CustomerModel.findByIdAndUpdate(customer.id, {
-    name: customer.name,
-    cnpj: customer.cnpj,
-    contact: customer.contact,
-    email: customer.email,
-    phone: customer.phone,
-    status: customer.status,
-  });
-
-  return res.send(updateCustomer);
+  await CustomerModel.findByIdAndUpdate(idCustomer, data)
+    .then((response) => {
+      if (response) {
+        return res.status(200).json({ message: "Customer updated" });
+      } else {
+        return res.status(404).json({ errorMessage: "Customer not found" });
+      }
+    })
+    .catch((err) => {
+      return res.status(404).json({
+        errorMessage: err.message,
+      });
+    });
 }
 
-export async function removeCustomer(req, res) {
-  const { id } = req.body;
+export async function deleteCustomer(req, res) {
+  const { idCustomer } = req.body;
 
-  const removeCustomer = await CustomerModel.findByIdAndDelete(id);
-
-  return res.json(removeCustomer);
+  await CustomerModel.findByIdAndDelete(idCustomer)
+    .then((response) => {
+      if (response) {
+        return res.status(200).json({ message: "Customer deleted" });
+      } else {
+        return res.status(404).json({ errorMessage: "Customer not found" });
+      }
+    })
+    .catch((err) => {
+      return res.status(404).json({ errorMessage: err.message });
+    });
 }

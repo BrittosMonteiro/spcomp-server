@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 
 const customerSchema = new mongoose.Schema({
-  name: String,
-  cnpj: String,
-  contact: String,
-  email: String,
-  phone: String,
-  status: Boolean,
-  observation: String,
+  name: { type: String, required: true },
+  cnpj: { type: String, required: true, unique: true },
+  contact: { type: String, required: false },
+  email: { type: String, required: true, unique: true },
+  phone: { type: String, required: false },
+  status: { type: Boolean, required: true },
+  observation: { type: String, required: false },
 });
 
 const CustomerModel = mongoose.model("customer", customerSchema);
