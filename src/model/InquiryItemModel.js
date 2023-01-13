@@ -18,6 +18,8 @@ const inquirySchema = new mongoose.Schema({
   idSupplier: String,
   nameSupplier: String,
   nameUser: String,
+  idCustomer: String,
+  nameCustomer: String,
 });
 
 const InquiryModel = mongoose.model("inquiry", inquirySchema);

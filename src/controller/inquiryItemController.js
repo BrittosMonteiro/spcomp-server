@@ -25,6 +25,8 @@ export async function createInquiryItem(req, res) {
     nameUser: data.nameUser,
     idSupplier: "",
     nameSupplier: "",
+    idCustomer: "",
+    nameCustomer: "",
   });
 
   const create = await inquiryModel.save();
@@ -54,6 +56,8 @@ export async function readInquiryItems(req, res) {
           unitSalePrice: doc.unitSalePriceInCents / 100,
           idUser: doc.idUser,
           nameUser: doc.nameUser,
+          idCustomer: doc.idCustomer,
+          nameCustomer: doc.nameCustomer,
         };
         items.unshift(data);
       }
@@ -82,6 +86,8 @@ export async function updateInquiryItem(req, res) {
     quantity: data.quantity,
     unitPurchasePriceInCents: data.unitPurchasePrice * 100,
     unitSalePriceInCents: data.unitSalePrice * 100,
+    idCustomer: data.idCustomer,
+    nameCustomer: data.nameCustomer,
   });
   return res.send(update);
 }
