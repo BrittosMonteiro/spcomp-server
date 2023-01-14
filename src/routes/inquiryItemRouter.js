@@ -4,6 +4,7 @@ const InquiryItemRouter = express.Router();
 import {
   createInquiryItem,
   readInquiryItems,
+  readInquiryItemQtyByUser,
   updateInquiryItem,
   updateInquiryItemPrice,
   deleteInquiryItem,
@@ -11,6 +12,7 @@ import {
 
 InquiryItemRouter.post("/", createInquiryItem);
 InquiryItemRouter.get("/", readInquiryItems);
+InquiryItemRouter.get("/qtyByUser/:idUser", readInquiryItemQtyByUser);
 InquiryItemRouter.put("/", updateInquiryItem);
 InquiryItemRouter.put("/updateInquiryItemPrice", updateInquiryItemPrice);
 InquiryItemRouter.delete("/", deleteInquiryItem);

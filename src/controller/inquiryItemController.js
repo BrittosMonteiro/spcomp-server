@@ -69,6 +69,26 @@ export async function readInquiryItems(req, res) {
   return res.json(items);
 }
 
+export async function readInquiryItemQtyByUser(req, res) {
+  const { idUser } = req.params;
+
+  await InquiryModel.find()
+    .where("idUser")
+    .equals(idUser)
+    .then((response) => {
+      if (response) {
+        return res.status(200).json({ data: response.length });
+      } else {
+        return res
+          .status(404)
+          .json({ errorMessage: "Não foi possível carregar os itens" });
+      }
+    })
+    .catch((err) => {
+      return res.status(404).json({ errorMessage: err.message });
+    });
+}
+
 export async function updateInquiryItem(req, res) {
   const data = req.body;
 
