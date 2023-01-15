@@ -6,6 +6,7 @@ import {
   readInquiryList,
   readInquiryListByCompany,
   readSingleItemFromInquiryList,
+  readInquiryListToDownload,
   updateInquiryList,
   deleteInquiryList,
 } from "../controller/inquiryListController.js";
@@ -17,6 +18,7 @@ InquiryListRouter.get(
   readInquiryListByCompany
 );
 InquiryListRouter.get("/single/:idInquiryItem", readSingleItemFromInquiryList);
+InquiryListRouter.post("/inquiryListDownload", readInquiryListToDownload);
 InquiryListRouter.put("/", updateInquiryList);
 InquiryListRouter.delete("/", deleteInquiryList);
 

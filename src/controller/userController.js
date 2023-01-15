@@ -1,76 +1,102 @@
+import {
+  createUserCommnand,
+  readUserCommand,
+  upateUserCommand,
+} from "../commands/userCommands.js";
+import {
+  created,
+  errorNotFound,
+  errorServiceUnavailable,
+  successData,
+  successMessage,
+} from "../handlers/returns.js";
 import UserModel from "../model/userModel.js";
 
 export async function createUser(req, res) {
-  const { name, surname, status, role } = req.body;
+  const data = req.body;
+  const user = createUserCommnand(data);
 
-  const userModel = new UserModel({
-    name: name,
-    surname: surname,
-    username: `${name.toLowerCase()}.${surname.toLowerCase()}`,
-    email: `${name.toLowerCase()}.${surname.toLowerCase()}@spcomponentes.com.br`,
-    password: "teste123",
-    status: status,
-    isAdmin: role === 1 || false,
-    role: role,
-  });
-
-  const create = await userModel.save();
-
-  return res.json(create);
+  await new UserModel(user)
+    .save()
+    .then((response) => {
+      if (response) {
+        return created(res, "User created");
+      } else {
+        return errorServiceUnavailable(res, "User could not be created");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
 
-export async function getUsersList(req, res) {
+export async function readUsers(req, res) {
   let usersList = [];
 
   await UserModel.find()
     .sort({ name: "asc" })
     .then((docs) => {
-      for (let doc of docs) {
-        const user = {
-          name: doc.name,
-          surname: doc.surname,
-          username: doc.username,
-          email: doc.email,
-          status: doc.status,
-          isAdmin: doc.isAdmin,
-          id: doc._id.toString(),
-          role: doc.role,
-        };
-        usersList.push(user);
+      if (docs) {
+        for (let doc of docs) {
+          const user = readUserCommand(doc);
+          usersList.push(user);
+        }
+        return successData(res, usersList);
+      } else {
+        return errorServiceUnavailable(res, "User could not be loaded");
       }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
     });
-
-  return res.json(usersList);
 }
 
-export async function getUserById(req, res) {
-  const { id } = req.body;
+export async function readUserById(req, res) {
+  const { idUser } = req.params;
 
-  const user = await UserModel.findById(id);
-
-  return res.json(user);
+  await UserModel.findById(idUser)
+    .then((response) => {
+      if (response) {
+        const user = readUserCommand(response);
+        return successData(res, user);
+      } else {
+        return errorServiceUnavailable(res, "User could not be loaded");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
 
 export async function updateUser(req, res) {
-  const data = req.body;
+  const { idUser, data } = req.body;
+  const user = upateUserCommand(data);
 
-  const update = await UserModel.findByIdAndUpdate(data.id, {
-    name: data.name,
-    surname: data.surname,
-    username: `${data.name.toLowerCase()}.${data.surname.toLowerCase()}`,
-    email: data.email,
-    password: data.password,
-    status: data.status,
-    isAdmin: data.isAdmin,
-  });
-
-  return res.json(update);
+  await UserModel.findByIdAndUpdate(idUser, user)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "User updated");
+      } else {
+        return errorServiceUnavailable(res, "User could not be updated");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
 
-export async function removeUser(req, res) {
-  const { id } = req.body;
+export async function deleteUser(req, res) {
+  const { idUser } = req.body;
 
-  const removeUser = await UserModel.findByIdAndDelete(id);
-
-  return res.send(removeUser);
+  await UserModel.findByIdAndDelete(idUser)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "User deleted");
+      } else {
+        return errorServiceUnavailable(res, "User could not be deleted");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }

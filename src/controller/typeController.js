@@ -1,3 +1,10 @@
+import {
+  created,
+  errorNotFound,
+  errorServiceUnavailable,
+  successData,
+  successMessage,
+} from "../handlers/returns.js";
 import TypeModel from "../model/typeModel.js";
 
 export async function createType(req, res) {
@@ -7,15 +14,13 @@ export async function createType(req, res) {
     .save()
     .then((response) => {
       if (response) {
-        return res.status(201).json({ message: "Type created" });
+        return created(res, "Type created");
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Type could not be created" });
+        return errorServiceUnavailable(res, "Type could not be created");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -33,15 +38,13 @@ export async function readType(req, res) {
           };
           items.push(data);
         }
-        return res.status(200).json({ data: items });
+        return successData(res, items);
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Types could not be loaded" });
+        return errorServiceUnavailable(res, "Type list could not be loaded");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -51,15 +54,13 @@ export async function updateType(req, res) {
   await TypeModel.findByIdAndUpdate(idType, data)
     .then((response) => {
       if (response) {
-        return res.status(200).json({ message: "Type updated" });
+        return successMessage(res, "Type updated");
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Type could not be updated" });
+        return errorServiceUnavailable(res, "Type could not be updated");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -69,14 +70,12 @@ export async function deleteType(req, res) {
   await TypeModel.findByIdAndDelete(idType)
     .then((response) => {
       if (response) {
-        return res.status(200).json({ message: "Type deleted" });
+        return successMessage(res, "Type deleted");
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Type could not be deleted" });
+        return errorServiceUnavailable(res, "Type could not be deleted");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }

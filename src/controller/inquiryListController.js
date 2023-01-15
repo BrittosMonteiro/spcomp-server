@@ -1,11 +1,13 @@
 import SupplierInquiryModel from "../model/supplierInquiryModel.js";
 import SupplierModel from "../model/supplierModel.js";
+import { exportInquiryListToExcel } from "./download.js";
 
 export async function createInquiryList(req, res) {
   const { idInquiryHistory, items } = req.body;
+  const inquiryList = [];
 
   if (!idInquiryHistory) {
-    return res.json({ errorMessage: "Missing idInquiryHistory", status: 404 });
+    return res.status(404).json({ errorMessage: "Missing idInquiryHistory" });
   }
 
   await SupplierModel.find()
@@ -13,17 +15,31 @@ export async function createInquiryList(req, res) {
     .equals(true)
     .then((docs) => {
       for (let doc of docs) {
-        new SupplierInquiryModel({
+        const data = {
           idInquiryHistory: idInquiryHistory,
           idSupplier: doc._id.toString(),
           nameSupplier: doc.name,
           items: items,
-        }).save();
+        };
+        inquiryList.push(data);
       }
-      return res.json({ status: 200 });
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return res.status(404).json({ errorMessage: err.message });
+    });
+
+  await SupplierInquiryModel.insertMany(inquiryList)
+    .then((response) => {
+      if (response) {
+        return res.status(201).json({ message: "Inquiry created" });
+      } else {
+        return res
+          .status(404)
+          .json({ errorMessage: "Inquiry Could not b created" });
+      }
+    })
+    .catch((err) => {
+      return res.status(404).json({ errorMessage: err.message });
     });
 }
 
@@ -49,6 +65,41 @@ export async function readInquiryList(req, res) {
     })
     .catch((err) => {
       return res.json({ errorMessage: err, status: 404 });
+    });
+}
+
+export async function readInquiryListToDownload(req, res) {
+  const { idInquiryHistory, title } = req.body;
+  const worksheetColumnNames = [
+    "Quantity",
+    "Type",
+    "Description",
+    "Encap",
+    "Brand",
+    "Price USD",
+  ];
+  let inquiryList = [];
+
+  await SupplierInquiryModel.find()
+    .where("idInquiryHistory")
+    .equals(idInquiryHistory)
+    .then((docs) => {
+      for (let item of docs[0].items) {
+        const data = {
+          quantity: item.quantity,
+          type: item.type,
+          description: item.description,
+          encap: item.encap,
+          brand: item.brand,
+          unitPurchasePrice: 0,
+        };
+        inquiryList.push(data);
+      }
+      exportInquiryListToExcel(inquiryList, worksheetColumnNames, title);
+      return res.json({ inquiryList, status: 200 });
+    })
+    .catch((err) => {
+      return res.json({ errorMessage: err.message, status: 404 });
     });
 }
 
@@ -104,7 +155,6 @@ export async function readSingleItemFromInquiryList(req, res) {
       return res.json({ inquiryList, status: 200 });
     })
     .catch((err) => {
-      console.log(err);
       return res.json({ errorMessage: err, status: 404 });
     });
 }

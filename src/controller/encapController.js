@@ -1,3 +1,10 @@
+import {
+  created,
+  errorNotFound,
+  errorServiceUnavailable,
+  successData,
+  successMessage,
+} from "../handlers/returns.js";
 import EncapModel from "../model/encapModel.js";
 
 export async function createEncap(req, res) {
@@ -7,15 +14,13 @@ export async function createEncap(req, res) {
     .save()
     .then((response) => {
       if (response) {
-        return res.status(201).json({ message: "Encap created" });
+        return created(res, "Encap created");
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Encap could not be created" });
+        return errorServiceUnavailable(res, "Encap could not be created");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -33,15 +38,13 @@ export async function readEncap(req, res) {
           };
           items.push(data);
         }
-        return res.status(200).json({ data: items });
+        return successData(res, items);
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Encap could not be loaded" });
+        return errorServiceUnavailable(res, "Encap could not be loaded");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -51,15 +54,13 @@ export async function updateEncap(req, res) {
   await EncapModel.findByIdAndUpdate(idEncap, data)
     .then((response) => {
       if (response) {
-        return res.status(200).json({ message: "Encap updated" });
+        return successMessage(res, "Encap updated");
       } else {
-        return res
-          .status(200)
-          .json({ errorMessage: "Encap could no be updated" });
+        return errorServiceUnavailable(res, "Encap could not be updated");
       }
     })
     .catch((err) => {
-      return res.status(200).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -69,14 +70,12 @@ export async function deleteEncap(req, res) {
   await EncapModel.findByIdAndDelete(idEncap)
     .then((response) => {
       if (response) {
-        return res.status(200).json({ message: "Encap deleted" });
+        return successMessage(res, "Encap deleted");
       } else {
-        return res
-          .status(200)
-          .json({ errorMessage: "Encap could not be deleted" });
+        return errorServiceUnavailable(res, "Encap could not be deleted");
       }
     })
     .catch((err) => {
-      return res.status(200).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }

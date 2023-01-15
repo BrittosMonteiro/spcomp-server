@@ -16,7 +16,7 @@ import StockRouter from "./src/routes/stock.js";
 import BrandRouter from "./src/routes/brandRouter.js";
 import TypeRouter from "./src/routes/typeRouter.js";
 import EncapRouter from "./src/routes/encapRouter.js";
-import UserRouter from "./src/routes/users.js";
+import UserRouter from "./src/routes/usersRouter.js";
 import LoginRouter from "./src/routes/login.js";
 import SupplierRoute from "./src/routes/supplier.js";
 import CustomerRoute from "./src/routes/customerRouter.js";

@@ -1,3 +1,10 @@
+import {
+  created,
+  errorNotFound,
+  errorServiceUnavailable,
+  successData,
+  successMessage,
+} from "../handlers/returns.js";
 import BrandModel from "../model/brandModel.js";
 
 export async function createBrand(req, res) {
@@ -7,15 +14,13 @@ export async function createBrand(req, res) {
     .save()
     .then((response) => {
       if (response) {
-        return res.status(201).json({ message: "Brand created" });
+        return created(res, "Brand created");
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Brand could not be created" });
+        return errorServiceUnavailable(res, "Brand could not be created");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -33,15 +38,13 @@ export async function readBrands(req, res) {
           };
           items.push(data);
         }
-        return res.status(200).json({ data: items });
+        return successData(res, items);
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Brands could not be loaded" });
+        return errorServiceUnavailable(res, "Brand could not be created");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -51,15 +54,13 @@ export async function updateBrand(req, res) {
   await BrandModel.findByIdAndUpdate(idBrand, data)
     .then((response) => {
       if (response) {
-        return res.status(200).json({ message: "Brand updated" });
+        return successMessage(res, "Brand updated");
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Brand could not be updated" });
+        return errorServiceUnavailable(res, "Brand could not be created");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -69,14 +70,12 @@ export async function deleteBrand(req, res) {
   await BrandModel.findByIdAndDelete(idBrand)
     .then((response) => {
       if (response) {
-        return res.status(200).json({ message: "Brand deleted" });
+        return successMessage(res, "Brand deleted");
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Brand could not be deleted" });
+        return errorServiceUnavailable(res, "Brand could not be created");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
