@@ -2,6 +2,10 @@ export function created(res, message) {
   return res.status(201).json({ message: message });
 }
 
+export function createdData(res, data) {
+  return res.status(201).json({ data: data });
+}
+
 export function successData(res, data) {
   return res.status(200).json({ data: data });
 }

@@ -1,3 +1,4 @@
+import { readEncapCommand } from "../commands/encapCommands().js";
 import {
   created,
   errorNotFound,
@@ -32,11 +33,8 @@ export async function readEncap(req, res) {
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
-          const data = {
-            id: doc._id,
-            description: doc.description,
-          };
-          items.push(data);
+          const encap = readEncapCommand(doc);
+          items.push(encap);
         }
         return successData(res, items);
       } else {

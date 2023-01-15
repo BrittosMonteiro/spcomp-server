@@ -1,3 +1,4 @@
+import { readBrandsCommand } from "../commands/brandCommands.js";
 import {
   created,
   errorNotFound,
@@ -32,11 +33,8 @@ export async function readBrands(req, res) {
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
-          const data = {
-            id: doc._id,
-            description: doc.description,
-          };
-          items.push(data);
+          const brand = readBrandsCommand(doc);
+          items.push(brand);
         }
         return successData(res, items);
       } else {

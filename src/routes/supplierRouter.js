@@ -2,16 +2,16 @@ import express from "express";
 const SupplierRoute = express.Router();
 import {
   createSupplier,
-  getSupplierById,
-  getSuppliersList,
+  readSuppliers,
+  readSupplierById,
   removeSupplier,
   updateSupplier,
   loginSupplier,
 } from "../controller/supplierController.js";
 
 SupplierRoute.post("/", createSupplier);
-SupplierRoute.get("/", getSuppliersList);
-SupplierRoute.get("/id", getSupplierById);
+SupplierRoute.get("/", readSuppliers);
+SupplierRoute.get("/single/:idSupplier", readSupplierById);
 SupplierRoute.put("/", updateSupplier);
 SupplierRoute.delete("/", removeSupplier);
 SupplierRoute.post("/login", loginSupplier);

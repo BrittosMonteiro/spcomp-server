@@ -7,7 +7,7 @@ const CONNECT = process.env.MONGO_CONNECT;
 const CONNECTDB = process.env.MONGO_DB;
 const PORT = process.env.PORT || 5050;
 
-import item from "./src/routes/item.js";
+import item from "./src/routes/itemRouter.js";
 import InquiryItemRouter from "./src/routes/inquiryItemRouter.js";
 import inquiryHistoryRouter from "./src/routes/inquiryHistoryRouter.js";
 import InquiryListRouter from "./src/routes/inquiryListRouter.js";
@@ -18,7 +18,7 @@ import TypeRouter from "./src/routes/typeRouter.js";
 import EncapRouter from "./src/routes/encapRouter.js";
 import UserRouter from "./src/routes/usersRouter.js";
 import LoginRouter from "./src/routes/login.js";
-import SupplierRoute from "./src/routes/supplier.js";
+import SupplierRoute from "./src/routes/supplierRouter.js";
 import CustomerRoute from "./src/routes/customerRouter.js";
 
 const app = express();

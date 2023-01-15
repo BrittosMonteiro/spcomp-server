@@ -1,53 +1,58 @@
+import {
+  createSupplierCommand,
+  readSuppliersCommand,
+} from "../commands/supplierCommands.js";
+import {
+  created,
+  errorNotFound,
+  errorServiceUnavailable,
+  successData,
+} from "../handlers/returns.js";
 import SupplierModel from "../model/supplierModel.js";
 
 export async function createSupplier(req, res) {
-  const supplier = req.body;
+  const data = req.body;
+  const supplier = createSupplierCommand(data);
 
-  const supplierModel = new SupplierModel({
-    name: supplier.supplierName,
-    contact: supplier.contactName,
-    email: supplier.email,
-    status: supplier.status,
-    observation: supplier.observation,
-    password: supplier.password,
-    role: 4,
-    isAdmin: false,
-    username: supplier.username,
-  });
-
-  const create = await supplierModel.save();
-
-  return res.send(create);
+  await new SupplierModel(supplier)
+    .save()
+    .then((response) => {
+      if (response) {
+        return created(res, "Supplier created");
+      } else {
+        return errorServiceUnavailable(res, "Supplier could not be created");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
 
-export async function getSuppliersList(req, res) {
+export async function readSuppliers(req, res) {
   let suppliersList = [];
 
   await SupplierModel.find()
     .then((docs) => {
-      for (let doc of docs) {
-        const supplier = {
-          id: doc._id,
-          name: doc.name,
-          contact: doc.contact,
-          email: doc.email,
-          status: doc.status,
-          observation: doc.observation,
-        };
-        suppliersList.push(supplier);
+      if (docs) {
+        for (let doc of docs) {
+          const supplier = readSuppliersCommand(doc);
+          suppliersList.push(supplier);
+        }
+        return successData(res, suppliersList);
+      } else {
+        return errorServiceUnavailable(res, "Supplier could not be loaded");
       }
     })
-    .catch((err) => console.log(err));
-
-  return res.json(suppliersList);
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
 
-export async function getSupplierById(req, res) {
-  const { id } = req.body;
+export async function readSupplierById(req, res) {
+  const { idSupplier } = req.params;
 
-  const supplier = await SupplierModel.findById(id);
-
-  return res.json(supplier);
+  await SupplierModel.findById(idSupplier);
+  //continuar implementação
 }
 
 export async function updateSupplier(req, res) {

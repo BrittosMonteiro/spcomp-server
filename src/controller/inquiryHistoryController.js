@@ -1,21 +1,35 @@
+import {
+  createInquiryHistoryCommand,
+  readInquiryHistoryCommand,
+  updateInquiryHistoryCommand,
+} from "../commands/inquiryHistoryCommands.js";
+import {
+  createdData,
+  errorNotFound,
+  errorServiceUnavailable,
+  successData,
+  successMessage,
+} from "../handlers/returns.js";
 import InquiryHistoryModel from "../model/inquiryHistoryModel.js";
 
 export async function createInquiryHistory(req, res) {
-  const { title } = req.body;
+  const data = req.body;
+  const inquiryHistory = createInquiryHistoryCommand(data);
 
-  await new InquiryHistoryModel({
-    title,
-    status: true,
-  })
+  await new InquiryHistoryModel(inquiryHistory)
     .save()
     .then((response) => {
-      return res.json({
-        idInquiryHistory: response._id.toString(),
-        status: 200,
-      });
+      if (response) {
+        return createdData(res, response._id.toString());
+      } else {
+        return errorServiceUnavailable(
+          res,
+          "Inquiry History could not be created"
+        );
+      }
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -24,19 +38,21 @@ export async function readInquiryHistory(req, res) {
 
   await InquiryHistoryModel.find()
     .then((docs) => {
-      for (let doc of docs) {
-        const history = {
-          id: doc._id,
-          title: doc.title,
-          status: doc.status,
-        };
-        inquiryHistoryList.unshift(history);
+      if (docs) {
+        for (let doc of docs) {
+          const inquiryHistory = readInquiryHistoryCommand(doc);
+          inquiryHistoryList.unshift(inquiryHistory);
+        }
+        return successData(res, inquiryHistoryList);
+      } else {
+        return errorServiceUnavailable(
+          res,
+          "Inquiry history could not be loaded"
+        );
       }
-
-      return res.json({ data: inquiryHistoryList, status: 200 });
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -47,32 +63,41 @@ export async function readActiveInquiryHistory(req, res) {
     .where("status")
     .equals(true)
     .then((docs) => {
-      for (let doc of docs) {
-        const history = {
-          id: doc._id,
-          title: doc.title,
-        };
-        inquiryHistoryList.unshift(history);
+      if (docs) {
+        for (let doc of docs) {
+          const inquiryHistory = readInquiryHistoryCommand(doc);
+          inquiryHistoryList.unshift(inquiryHistory);
+        }
+        return successData(res, inquiryHistoryList);
+      } else {
+        return errorServiceUnavailable(
+          res,
+          "Inquiry history could not be loaded"
+        );
       }
-
-      return res.json({ data: inquiryHistoryList, status: 200 });
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return errorNotFound(res, err.message);
     });
 }
 
 export async function updateInquiryHistory(req, res) {
-  const { idInquiryHistory, status } = req.body;
+  const { idInquiryHistory, data } = req.body;
+  const inquiryHistory = updateInquiryHistoryCommand(data);
 
-  await InquiryHistoryModel.findByIdAndUpdate(idInquiryHistory, {
-    status: status,
-  })
+  await InquiryHistoryModel.findByIdAndUpdate(idInquiryHistory, inquiryHistory)
     .then((response) => {
-      return res.json({ data: response, status: 200 });
+      if (response) {
+        return successMessage(res, "Inquiry history update");
+      } else {
+        return errorServiceUnavailable(
+          res,
+          "Inquiry history could not be updated"
+        );
+      }
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -81,9 +106,16 @@ export async function deleteInquiryHistory(req, res) {
 
   await InquiryHistoryModel.findByIdAndDelete(idInquiryHistory)
     .then((response) => {
-      return res.json({ data: response, status: 200 });
+      if (response) {
+        return successMessage(res, "Inquiry history deleted");
+      } else {
+        return errorServiceUnavailable(
+          res,
+          "Inquiry history could not be deleted"
+        );
+      }
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return errorNotFound(res, err.message);
     });
 }

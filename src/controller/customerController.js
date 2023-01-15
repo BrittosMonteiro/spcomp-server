@@ -1,3 +1,13 @@
+import {
+  readCustomersCommand,
+  readCustomerToItemCommand,
+} from "../commands/customerCommands.js";
+import {
+  created,
+  errorNotFound,
+  errorServiceUnavailable,
+  successData,
+} from "../handlers/returns.js";
 import CustomerModel from "../model/customerModel.js";
 
 export async function createCustomer(req, res) {
@@ -7,17 +17,13 @@ export async function createCustomer(req, res) {
     .save()
     .then((response) => {
       if (response) {
-        return res.status(201).json({
-          message: "Customer created",
-        });
+        return created(res, "Customer created");
       } else {
-        return res.status(404).json({
-          errorMessage: "Customer could not be created",
-        });
+        return errorServiceUnavailable(res, "Customer could not be created");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -29,26 +35,16 @@ export async function readCustomers(req, res) {
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
-          const customer = {
-            id: doc._id.toString(),
-            name: doc.name,
-            cnpj: doc.cnpj,
-            contact: doc.contact,
-            email: doc.email,
-            phone: doc.phone,
-            status: doc.status,
-          };
+          const customer = readCustomersCommand(doc);
           customersList.push(customer);
         }
-        return res.status(200).json({ data: customersList });
+        return successData(res, customersList);
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Customer could not be loaded" });
+        return errorServiceUnavailable(res, "Customer could not be loaded");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -58,22 +54,14 @@ export async function readCustomerById(req, res) {
   await CustomerModel.findById(idCustomer)
     .then((doc) => {
       if (doc) {
-        const data = {
-          id: idCustomer,
-          name: doc.name,
-          cnpj: doc.cnpj,
-          contact: doc.contact,
-          email: doc.email,
-          phone: doc.phone,
-          status: doc.status,
-        };
-        return res.status(200).json({ data });
+        const customer = readCustomersCommand(doc);
+        return successData(res, customer);
       } else {
-        return res.status(404).json({ errorMessage: "Customer not found" });
+        return errorServiceUnavailable(res, "Customer could not be loaded");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorNotFound(res, err.message);
     });
 }
 
@@ -87,21 +75,16 @@ export async function readCustomerToItem(req, res) {
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
-          const customer = {
-            id: doc._id.toString(),
-            name: doc.name,
-          };
+          const customer = readCustomerToItemCommand(doc);
           customersList.push(customer);
         }
-        return res.status(200).json({ data: customersList });
+        return successData(res, customersList);
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Customers could not be loaded" });
+        return errorServiceUnavailable(res, "Customer could not be loaded");
       }
     })
     .catch((err) => {
-      return res.status(404).send(err);
+      return errorNotFound(res, err.message);
     });
 }
 

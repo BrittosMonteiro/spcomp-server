@@ -1,65 +1,80 @@
+import { readItemCommand } from "../commands/itemCommands.js";
+import {
+  created,
+  errorNotFound,
+  errorServiceUnavailable,
+  successData,
+  successMessage,
+} from "../handlers/returns.js";
 import ItemModel from "../model/ItemModel.js";
 
 export async function createItem(req, res) {
   const data = req.body;
 
-  let itemModel = new ItemModel({
-    description: data.description,
-    brand: data.brand,
-    type: data.type,
-    encap: data.encap,
-    ipi: data.ipi,
-    weight: data.weight,
-    note: data.note,
-  });
-
-  const create = await itemModel.save();
-  return res.send(create);
-}
-
-export async function getAllItems(req, res) {
-  let items = [];
-  await ItemModel.find()
-    .then((res) => {
-      for (let r of res) {
-        const data = {
-          id: r._id,
-          description: r.description,
-          brand: r.brand,
-          type: r.type,
-          encap: r.encap,
-          ipi: r.ipi,
-          weight: r.weight,
-          note: r.note,
-        };
-        items.unshift(data);
+  await new ItemModel(data)
+    .save()
+    .then((response) => {
+      if (response) {
+        return created(res, "Item created");
+      } else {
+        return errorServiceUnavailable(res, "Item could not be created");
       }
     })
     .catch((err) => {
-      console.log(err);
+      return errorNotFound(res, err.message);
+    });
+}
+
+export async function readItems(req, res) {
+  let itemsList = [];
+
+  await ItemModel.find()
+    .then((docs) => {
+      if (docs) {
+        for (let doc of docs) {
+          const item = readItemCommand(doc);
+          itemsList.unshift(item);
+        }
+        return successData(res, itemsList);
+      } else {
+        return errorServiceUnavailable(res, "Item could not be loaded");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
     });
 
   return res.json(items);
 }
 
 export async function updateItem(req, res) {
-  const data = req.body;
+  const { idItem, data } = req.body;
 
-  const update = await ItemModel.findByIdAndUpdate(data.id, {
-    description: data.description,
-    brand: data.brand,
-    type: data.type,
-    encap: data.encap,
-    ipi: data.ipi,
-    weight: data.weight,
-    note: data.note,
-  });
-
-  return res.send(update);
+  await ItemModel.findByIdAndUpdate(idItem, data)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Item updated");
+      } else {
+        return errorServiceUnavailable(res, "Item could not be loaded");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
 
 export async function deleteItem(req, res) {
-  const idItem = req.body.id;
-  const remove = await ItemModel.findByIdAndDelete(idItem);
-  return res.send(remove);
+  const { idItem } = req.body;
+
+  await ItemModel.findByIdAndDelete(idItem)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Item deleted");
+      } else {
+        return errorServiceUnavailable(res, "Item could not be deleted");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
