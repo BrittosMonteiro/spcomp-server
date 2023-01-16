@@ -1,14 +1,14 @@
 export function createSupplierCommand(data) {
   const supplier = {
-    name: data.supplierName,
-    contact: data.contactName,
+    contact: data.contact,
     email: data.email,
-    status: data.status,
-    observation: data.observation,
-    password: data.password,
-    role: 4,
     isAdmin: false,
-    username: data.username,
+    name: data.name,
+    observation: data.observation,
+    password: "teste123",
+    role: 4,
+    status: data.status,
+    username: data.name.toLowerCase().replace(/\s/g, ""),
   };
 
   return supplier;

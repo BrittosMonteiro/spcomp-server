@@ -88,7 +88,7 @@ export async function updateInquiryHistory(req, res) {
   await InquiryHistoryModel.findByIdAndUpdate(idInquiryHistory, inquiryHistory)
     .then((response) => {
       if (response) {
-        return successMessage(res, "Inquiry history update");
+        return successMessage(res, "Inquiry history updated");
       } else {
         return errorServiceUnavailable(
           res,

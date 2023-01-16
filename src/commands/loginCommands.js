@@ -6,5 +6,5 @@ export function loginCommand(data) {
     role: data.role,
   };
 
-  return loginCommand;
+  return loginData;
 }

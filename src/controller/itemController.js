@@ -43,8 +43,6 @@ export async function readItems(req, res) {
     .catch((err) => {
       return errorNotFound(res, err.message);
     });
-
-  return res.json(items);
 }
 
 export async function updateItem(req, res) {
