@@ -1,11 +1,9 @@
-import { loginCommand } from "../commands/loginCommands.js";
 import {
   createSupplierCommand,
   readSuppliersCommand,
 } from "../commands/supplierCommands.js";
 import {
   created,
-  errorCouldNotLoad,
   errorNotFound,
   errorServiceUnavailable,
   successData,
@@ -97,28 +95,5 @@ export async function deleteSupplier(req, res) {
     })
     .catch((err) => {
       return errorNotFound(res, err.message);
-    });
-}
-
-export async function loginSupplier(req, res) {
-  const { username, password } = req.body;
-
-  await SupplierModel.findOne()
-    .where("username")
-    .equals(username)
-    .then((response) => {
-      if (response) {
-        if (response.password === password) {
-          const supplier = loginCommand(response);
-          return successData(res, supplier);
-        } else {
-          return errorNotFound(res, "Username or password incorrect");
-        }
-      } else {
-        return errorNotFound(res, "Username or password incorrect");
-      }
-    })
-    .catch((err) => {
-      return errorCouldNotLoad(res, err.message);
     });
 }
