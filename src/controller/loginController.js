@@ -1,21 +1,30 @@
+import { loginCommand } from "../commands/loginCommands.js";
+import {
+  errorNotFound,
+  errorServiceUnavailable,
+  successData,
+} from "../handlers/returns.js";
 import UserModel from "../model/userModel.js";
 
 export async function Login(req, res) {
-  const data = req.body;
+  const { username, password } = req.body;
 
-  const getUserLogin = await UserModel.findOne()
+  await UserModel.findOne()
     .where("username")
-    .equals(data.username);
-
-  if (getUserLogin && getUserLogin.password === data.password) {
-    const data = {
-      username: getUserLogin.username,
-      isAdmin: getUserLogin.isAdmin,
-      token: getUserLogin._id,
-      role: getUserLogin.role,
-    };
-    return res.json({ data, status: 200 });
-  }
-
-  return res.json({ status: 404 });
+    .equals(username)
+    .then((response) => {
+      if (response) {
+        if (response.password === password) {
+          const userLogin = loginCommand(response);
+          return successData(res, userLogin);
+        } else {
+          return errorNotFound(res, "Username or password incorrect");
+        }
+      } else {
+        return errorNotFound(res, "Username or password incorrect");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
 }

@@ -1,12 +1,15 @@
+import { loginCommand } from "../commands/loginCommands.js";
 import {
   createSupplierCommand,
   readSuppliersCommand,
 } from "../commands/supplierCommands.js";
 import {
   created,
+  errorCouldNotLoad,
   errorNotFound,
   errorServiceUnavailable,
   successData,
+  successMessage,
 } from "../handlers/returns.js";
 import SupplierModel from "../model/supplierModel.js";
 
@@ -51,47 +54,71 @@ export async function readSuppliers(req, res) {
 export async function readSupplierById(req, res) {
   const { idSupplier } = req.params;
 
-  await SupplierModel.findById(idSupplier);
-  //continuar implementação
+  await SupplierModel.findById(idSupplier)
+    .then((response) => {
+      if (response) {
+        const supplier = readSuppliersCommand(response);
+        return successData(res, supplier);
+      } else {
+        return errorServiceUnavailable(res, "Supplier could not be loaded");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
 
 export async function updateSupplier(req, res) {
-  const supplier = req.body;
+  const { idSupplier, supplier } = req.body;
 
-  const updateSupplier = await SupplierModel.findByIdAndUpdate(supplier.id, {
-    name: supplier.supplierName,
-    contact: supplier.contactName,
-    email: supplier.email,
-    status: supplier.status,
-    observation: supplier.observation,
-  });
-
-  return res.json(updateSupplier);
+  await SupplierModel.findByIdAndUpdate(idSupplier, supplier)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Supplier updated");
+      } else {
+        return errorServiceUnavailable(res, "Supplier could not be updated");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
 
-export async function removeSupplier(req, res) {
-  const { id } = req.body;
-  const removeSupplier = await SupplierModel.findByIdAndDelete(id);
+export async function deleteSupplier(req, res) {
+  const { idSupplier } = req.body;
 
-  return res.json(removeSupplier);
+  await SupplierModel.findByIdAndDelete(idSupplier)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Supplier deleted");
+      } else {
+        return errorServiceUnavailable(res, "Suplier, could not be deleted");
+      }
+    })
+    .catch((err) => {
+      return errorNotFound(res, err.message);
+    });
 }
 
 export async function loginSupplier(req, res) {
-  const data = req.body;
+  const { username, password } = req.body;
 
-  const getSupplierLogin = await SupplierModel.findOne()
+  await SupplierModel.findOne()
     .where("username")
-    .equals(data.username);
-
-  if (getSupplierLogin && getSupplierLogin.password === data.password) {
-    const data = {
-      username: getSupplierLogin.username,
-      isAdmin: getSupplierLogin.isAdmin,
-      token: getSupplierLogin._id,
-      role: getSupplierLogin.role,
-    };
-    return res.json({ data, status: 200 });
-  }
-
-  return res.json({ status: 404 });
+    .equals(username)
+    .then((response) => {
+      if (response) {
+        if (response.password === password) {
+          const supplier = loginCommand(response);
+          return successData(res, supplier);
+        } else {
+          return errorNotFound(res, "Username or password incorrect");
+        }
+      } else {
+        return errorNotFound(res, "Username or password incorrect");
+      }
+    })
+    .catch((err) => {
+      return errorCouldNotLoad(res, err.message);
+    });
 }

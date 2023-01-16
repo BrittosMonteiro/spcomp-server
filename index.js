@@ -17,7 +17,7 @@ import BrandRouter from "./src/routes/brandRouter.js";
 import TypeRouter from "./src/routes/typeRouter.js";
 import EncapRouter from "./src/routes/encapRouter.js";
 import UserRouter from "./src/routes/usersRouter.js";
-import LoginRouter from "./src/routes/login.js";
+import LoginRouter from "./src/routes/loginRouter.js";
 import SupplierRoute from "./src/routes/supplierRouter.js";
 import CustomerRoute from "./src/routes/customerRouter.js";
 
