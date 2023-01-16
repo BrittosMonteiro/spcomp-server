@@ -1,36 +1,36 @@
+import {
+  createInquiryItemCommand,
+  readInquiryItemCommand,
+  updateInquiryItemCommand,
+  updateInquiryItemPriceCommand,
+} from "../commands/inquiryItemCommands.js";
+import {
+  errorCouldNotLoad,
+  errorServiceUnavailable,
+  successData,
+  successMessage,
+} from "../handlers/returns.js";
 import InquiryModel from "../model/InquiryItemModel.js";
 
 export async function createInquiryItem(req, res) {
   const data = req.body;
+  const inquiryItem = createInquiryItemCommand(data);
 
-  if (data.unitPriceInCents) {
-    data.unitPriceInCents = data.unitPriceInCents * 100;
-  }
-
-  const inquiryModel = new InquiryModel({
-    idItem: data.id,
-    description: data.description,
-    brand: data.brand,
-    type: data.type,
-    encap: data.encap,
-    ipi: data.ipi,
-    weight: data.weight,
-    note: data.note,
-    step: data.step,
-    status: data.status,
-    quantity: data.quantity,
-    unitPurchasePriceInCents: data.unitPurchasePrice * 100,
-    unitSalePriceInCents: data.unitSalePrice * 100,
-    idUser: data.idUser,
-    nameUser: data.nameUser,
-    idSupplier: "",
-    nameSupplier: "",
-    idCustomer: "",
-    nameCustomer: "",
-  });
-
-  const create = await inquiryModel.save();
-  return res.send(create);
+  await new InquiryModel(inquiryItem)
+    .save()
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Inquiry item created");
+      } else {
+        return errorServiceUnavailable(
+          res,
+          "Inquiry item could not be created"
+        );
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
 }
 
 export async function readInquiryItems(req, res) {
@@ -38,35 +38,19 @@ export async function readInquiryItems(req, res) {
 
   await InquiryModel.find()
     .then((docs) => {
-      for (let doc of docs) {
-        const data = {
-          id: doc._id,
-          idItem: doc.idItem,
-          description: doc.description,
-          brand: doc.brand,
-          type: doc.type,
-          encap: doc.encap,
-          ipi: doc.ipi,
-          weight: doc.weight,
-          note: doc.note,
-          step: doc.step,
-          status: doc.status,
-          quantity: doc.quantity,
-          unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
-          unitSalePrice: doc.unitSalePriceInCents / 100,
-          idUser: doc.idUser,
-          nameUser: doc.nameUser,
-          idCustomer: doc.idCustomer,
-          nameCustomer: doc.nameCustomer,
-        };
-        items.unshift(data);
+      if (docs) {
+        for (let doc of docs) {
+          const data = readInquiryItemCommand(doc);
+          items.unshift(data);
+        }
+        return successData(res, items);
+      } else {
+        return errorCouldNotLoad(res, "Inquiry item could not be loaded");
       }
     })
     .catch((err) => {
-      console.log(err);
+      return errorCouldNotLoad(res, err.message);
     });
-
-  return res.json(items);
 }
 
 export async function readInquiryItemQtyByUser(req, res) {
@@ -77,69 +61,70 @@ export async function readInquiryItemQtyByUser(req, res) {
     .equals(idUser)
     .then((response) => {
       if (response) {
-        return res.status(200).json({ data: response.length });
+        return successData(res, response.length);
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Não foi possível carregar os itens" });
+        return errorCouldNotLoad(
+          res,
+          "Inquiry item quantity could not be loaded"
+        );
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorServiceUnavailable(res, err.message);
     });
 }
 
 export async function updateInquiryItem(req, res) {
   const data = req.body;
+  const inquiryItem = updateInquiryItemCommand(data);
 
-  const update = await InquiryModel.findByIdAndUpdate(data.id, {
-    id: data.id,
-    description: data.description,
-    brand: data.brand,
-    type: data.type,
-    encap: data.encap,
-    ipi: data.ipi,
-    weight: data.weight,
-    note: data.note,
-    step: data.step,
-    status: data.status,
-    quantity: data.quantity,
-    unitPurchasePriceInCents: data.unitPurchasePrice * 100,
-    unitSalePriceInCents: data.unitSalePrice * 100,
-    idCustomer: data.idCustomer,
-    nameCustomer: data.nameCustomer,
-  });
-  return res.send(update);
+  await InquiryModel.findByIdAndUpdate(data.id, inquiryItem)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Inquiry item updated");
+      } else {
+        return errorCouldNotLoad(res, "Inquiry item could not be loaded");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
 }
 
 export async function updateInquiryItemPrice(req, res) {
-  const {
-    idInquiryItem,
-    unitPurchasePrice,
-    unitSalePrice,
-    idSupplier,
-    nameSupplier,
-  } = req.body;
+  const { idInquiryItem, data } = req.body;
+  const inquiryItem = updateInquiryItemPriceCommand(data);
 
-  await InquiryModel.findByIdAndUpdate(idInquiryItem, {
-    unitPurchasePriceInCents: unitPurchasePrice * 100,
-    unitSalePriceInCents: unitSalePrice * 100,
-    idSupplier: idSupplier,
-    nameSupplier: nameSupplier,
-  })
-    .then(() => {
-      return res.json({ status: 200 });
+  await InquiryModel.findByIdAndUpdate(idInquiryItem, inquiryItem)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Inquiry item prices and supplier updated");
+      } else {
+        return errorCouldNotLoad(
+          res,
+          "Inquiry item prices and supplier could not be updated"
+        );
+      }
     })
-    .catch(() => {
-      return res.json({ status: 404 });
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
     });
 
   return;
 }
 
 export async function deleteInquiryItem(req, res) {
-  const { id } = req.body;
+  const { idInquiryItem } = req.body;
 
-  const remove = await InquiryModel.findByIdAndDelete(id);
-  return res.send(remove);
+  await InquiryModel.findByIdAndDelete(idInquiryItem)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Inquiry item deleted");
+      } else {
+        return errorCouldNotLoad(res, "Inquiry item could not be deleted");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
 }

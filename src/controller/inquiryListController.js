@@ -1,3 +1,14 @@
+import {
+  createInquiryListCommand,
+  readInquiryListCommand,
+  readSingleItemFromInquiryListCommand,
+} from "../commands/inquiryListCommands.js";
+import {
+  errorCouldNotLoad,
+  errorServiceUnavailable,
+  successData,
+  successMessage,
+} from "../handlers/returns.js";
 import SupplierInquiryModel from "../model/supplierInquiryModel.js";
 import SupplierModel from "../model/supplierModel.js";
 import { exportInquiryListToExcel } from "./download.js";
@@ -6,40 +17,36 @@ export async function createInquiryList(req, res) {
   const { idInquiryHistory, items } = req.body;
   const inquiryList = [];
 
-  if (!idInquiryHistory) {
-    return res.status(404).json({ errorMessage: "Missing idInquiryHistory" });
-  }
-
   await SupplierModel.find()
     .where("status")
     .equals(true)
     .then((docs) => {
-      for (let doc of docs) {
-        const data = {
-          idInquiryHistory: idInquiryHistory,
-          idSupplier: doc._id.toString(),
-          nameSupplier: doc.name,
-          items: items,
-        };
-        inquiryList.push(data);
+      if (docs) {
+        for (let doc of docs) {
+          const data = createInquiryListCommand(doc, idInquiryHistory, items);
+          inquiryList.push(data);
+        }
+      } else {
+        return errorCouldNotLoad(res, "Supplier could not be loaded");
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorServiceUnavailable(res, err.message);
     });
 
   await SupplierInquiryModel.insertMany(inquiryList)
     .then((response) => {
       if (response) {
-        return res.status(201).json({ message: "Inquiry created" });
+        return successMessage(res, "Inquiry created");
       } else {
-        return res
-          .status(404)
-          .json({ errorMessage: "Inquiry Could not b created" });
+        return errorServiceUnavailable(
+          res,
+          "Inquiry list could not be created"
+        );
       }
     })
     .catch((err) => {
-      return res.status(404).json({ errorMessage: err.message });
+      return errorServiceUnavailable(res, err.message);
     });
 }
 
@@ -51,20 +58,18 @@ export async function readInquiryList(req, res) {
     .where("idInquiryHistory")
     .equals(idInquiryHistory)
     .then((docs) => {
-      for (let doc of docs) {
-        const data = {
-          idInquiryList: doc._id.toString(),
-          idInquiryHistory,
-          idSupplier: doc.idSupplier,
-          nameSupplier: doc.nameSupplier,
-          items: doc.items,
-        };
-        inquiryList.unshift(data);
+      if (docs) {
+        for (let doc of docs) {
+          const data = readInquiryListCommand(doc, idInquiryHistory);
+          inquiryList.unshift(data);
+        }
+        return successData(res, inquiryList);
+      } else {
+        return errorCouldNotLoad(res, "Inquiry list could not be loaded");
       }
-      return res.json({ inquiryList, status: 200 });
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return errorCouldNotLoad(res, err.message);
     });
 }
 
@@ -113,15 +118,11 @@ export async function readInquiryListByCompany(req, res) {
     .where("idSupplier")
     .equals(idSupplier)
     .then((doc) => {
-      const data = {
-        idInquiryList: doc._id.toString(),
-        idInquiryHistory,
-        idSupplier: doc.idSupplier,
-        nameSupplier: doc.nameSupplier,
-        items: doc.items,
-      };
-      inquiryList.unshift(data);
-      return res.json({ inquiryList, status: 200 });
+      if (doc) {
+        const data = readInquiryListCommand(doc, idInquiryHistory);
+        inquiryList.unshift(data);
+        return successData(res, inquiryList);
+      }
     })
     .catch((err) => {
       return res.json({ errorMessage: err, status: 404 });
@@ -136,59 +137,68 @@ export async function readSingleItemFromInquiryList(req, res) {
     .where("item.idInquiryItem")
     .equals(idInquiryItem)
     .then((docs) => {
-      for (let doc of docs) {
-        const data = {
-          idInquiryList: doc._id.toString(),
-          idInquiryHistory: doc.idInquiryHistory,
-          idSupplier: doc.idSupplier,
-          nameSupplier: doc.nameSupplier,
-          item: "",
-        };
-        data.item = doc.items.filter(
-          (item) => item.idInquiryItem === idInquiryItem
-        );
-
-        if (data.item.length > 0) {
-          inquiryList.unshift(data);
+      if (docs) {
+        for (let doc of docs) {
+          const data = readSingleItemFromInquiryListCommand(doc, idInquiryItem);
+          if (data.item.length > 0) {
+            inquiryList.unshift(data);
+          }
         }
+        return successData(res, inquiryList);
+      } else {
+        return errorCouldNotLoad(res, "Inquiry list could not be loaded");
       }
-      return res.json({ inquiryList, status: 200 });
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return errorCouldNotLoad(res, err.message);
     });
 }
 
 export async function updateInquiryList(req, res) {
   const { idInquiryList, idInquiryItem, unitPurchasePrice } = req.body;
 
-  let document = await SupplierInquiryModel.findById(idInquiryList);
+  await SupplierInquiryModel.findById(idInquiryList)
+    .then((response) => {
+      if (response) {
+        let index = response.items.findIndex(
+          (e) => e.idInquiryItem === idInquiryItem
+        );
+        let newItem = response.items[index];
+        newItem.unitPurchasePrice = unitPurchasePrice;
 
-  if (document) {
-    let index = document.items.findIndex(
-      (e) => e.idInquiryItem === idInquiryItem
-    );
-    let newItem = document.items[index];
-    newItem.unitPurchasePrice = unitPurchasePrice;
-
-    await SupplierInquiryModel.findByIdAndUpdate(idInquiryList, document)
-      .then(() => {
-        return res.json({ status: 200 });
-      })
-      .catch((err) => {
-        return res.json({ errorMessage: err, status: 404 });
-      });
-  }
+        SupplierInquiryModel.findByIdAndUpdate(idInquiryList, response)
+          .then((response) => {
+            if (response) {
+              return successMessage(res, "Inquiry list updated");
+            } else {
+              return errorCouldNotLoad(
+                res,
+                "Inquiry list could not be updated"
+              );
+            }
+          })
+          .catch((err) => {
+            return errorServiceUnavailable(res, err.message);
+          });
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
 }
 
 export async function deleteInquiryList(req, res) {
   const { idInquiryList } = req.body;
 
   await SupplierInquiryModel.findByIdAndDelete(idInquiryList)
-    .then(() => {
-      return res.json({ status: 200 });
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Inquiry list deleted");
+      } else {
+        return errorCouldNotLoad(res, "Inquiry list could not be deleted");
+      }
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return errorServiceUnavailable(res, err.message);
     });
 }

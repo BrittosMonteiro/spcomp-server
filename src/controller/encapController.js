@@ -1,4 +1,4 @@
-import { readEncapCommand } from "../commands/encapCommands().js";
+import { readEncapCommand } from "../commands/encapCommands.js";
 import {
   created,
   errorNotFound,
