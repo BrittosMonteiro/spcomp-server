@@ -1,3 +1,5 @@
+import bcrypt from "bcryptjs";
+
 export function createSupplierCommand(data) {
   const supplier = {
     contact: data.contact,
@@ -5,7 +7,7 @@ export function createSupplierCommand(data) {
     isAdmin: false,
     name: data.name,
     observation: data.observation,
-    password: "teste123",
+    password: bcrypt.hashSync("teste123", 14),
     role: 4,
     status: data.status,
     username: data.name.toLowerCase().replace(/\s/g, ""),

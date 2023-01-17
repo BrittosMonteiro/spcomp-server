@@ -1,68 +1,48 @@
+import { createPurchaseCommand } from "../commands/purchaseCommands.js";
 import PurchaseItemModel from "../model/purchaseModel.js";
 
-export async function createPurchaseItem(req, res) {
+export async function createPurchase(req, res) {
   const data = req.body;
+  const purchaseItem = createPurchaseCommand(data);
 
-  if (data.unitPrice) {
-    data.unitPriceInCents = data.unitPrice * 100;
-  }
-
-  const purchaseItemModel = new PurchaseItemModel({
-    idInquiry: data.id,
-    idItem: data.idItem,
-    description: data.description,
-    brand: data.brand,
-    type: data.type,
-    encap: data.encap,
-    ipi: data.ipi,
-    weight: data.weight,
-    note: data.note,
-    step: data.step,
-    status: data.status,
-    quantity: data.quantity,
-    unitPurchasePriceInCents: data.unitPurchasePrice * 100,
-    unitSalePriceInCents: data.unitSalePrice * 100,
-  });
-
-  const create = await purchaseItemModel.save();
-  return res.send(create);
-}
-
-export async function readPurchaseList(req, res) {
-  let items = [];
-
-  await PurchaseItemModel.find()
-    .then((docs) => {
-      for (let doc of docs) {
-        const data = {
-          id: doc._id,
-          idInquiry: doc.id,
-          idItem: doc.idItem,
-          description: doc.description,
-          brand: doc.brand,
-          type: doc.type,
-          encap: doc.encap,
-          ipi: doc.ipi,
-          weight: doc.weight,
-          note: doc.note,
-          step: doc.step,
-          status: doc.status,
-          quantity: doc.quantity,
-          unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
-          unitSalePrice: doc.unitSalePriceInCents / 100,
-        };
-        items.unshift(data);
+  await new PurchaseItemModel(purchaseItem)
+    .save()
+    .then((response) => {
+      if (response) {
+        console.log(response);
+        return;
       }
     })
     .catch((err) => {
-      conosole.log(err);
+      console.log(err);
     });
-  return res.json(items);
 }
 
-export async function readPurchaseItem(req, res) {}
+export async function readPurchase(req, res) {
+  let items = [];
 
-export async function updatePurchaseItem(req, res) {
+  await PurchaseItemModel.find()
+    .populate({ path: "idInquiryItem" })
+    .populate({ path: "idUser", select: "_id, username" })
+    .populate({ path: "idCustomer", select: "_id, name" })
+    .populate({ path: "idSupplier", select: "_id, name" })
+    .then((docs) => {
+      if (docs) {
+        // for (let doc of docs) {
+        //   const data = {};
+        //   items.unshift(data);
+        // }
+        return res.json(docs);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+export async function readSinglePurchase(req, res) {}
+
+export async function updatePurchase(req, res) {
   const data = req.body;
 
   const updateItem = await PurchaseItemModel.findByIdAndUpdate(data.id, {
@@ -83,7 +63,7 @@ export async function updatePurchaseItem(req, res) {
   });
 }
 
-export async function deletePurchaseItem(req, res) {
+export async function deletePurchase(req, res) {
   const { id } = req.body;
 
   const remove = await PurchaseItemModel.findByIdAndDelete(id);

@@ -6,16 +6,18 @@ import {
 } from "../handlers/returns.js";
 import UserModel from "../model/userModel.js";
 import SupplierModel from "../model/supplierModel.js";
+import bcrypt from "bcryptjs";
 
 export async function loginUser(req, res) {
   const { username, password } = req.body;
 
   await UserModel.findOne()
     .where("username")
-    .equals(username)
+    .equals(username.toLowerCase())
     .then((response) => {
       if (response) {
-        if (response.password === password) {
+        const comparePass = bcrypt.compareSync(password, response.password);
+        if (comparePass) {
           const userLogin = loginCommand(response);
           return successData(res, userLogin);
         } else {
@@ -38,7 +40,8 @@ export async function loginSupplier(req, res) {
     .equals(username)
     .then((response) => {
       if (response) {
-        if (response.password === password) {
+        const comparePass = bcrypt.compareSync(password, response.password);
+        if (comparePass) {
           const supplier = loginCommand(response);
           return successData(res, supplier);
         } else {

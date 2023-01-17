@@ -37,13 +37,19 @@ export async function readInquiryItems(req, res) {
   let items = [];
 
   await InquiryModel.find()
+    .populate({ path: "idItem" })
+    .populate({ path: "idUser", select: "_id, username" })
+    .populate({ path: "idSupplier", select: "_id, name" })
+    .populate({ path: "idCustomer", select: "_id, name" })
+    .exec()
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
           const data = readInquiryItemCommand(doc);
           items.unshift(data);
         }
-        return successData(res, items);
+        // return successData(res, items);
+        return res.json(items);
       } else {
         return errorCouldNotLoad(res, "Inquiry item could not be loaded");
       }

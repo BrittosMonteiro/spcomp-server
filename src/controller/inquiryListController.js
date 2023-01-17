@@ -101,10 +101,10 @@ export async function readInquiryListToDownload(req, res) {
         inquiryList.push(data);
       }
       exportInquiryListToExcel(inquiryList, worksheetColumnNames, title);
-      return res.json({ inquiryList, status: 200 });
+      return res.download(`./public/inquiries/${title}.xlsx`);
     })
     .catch((err) => {
-      return res.json({ errorMessage: err.message, status: 404 });
+      return errorServiceUnavailable(res, err.message);
     });
 }
 

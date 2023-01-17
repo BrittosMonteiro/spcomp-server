@@ -1,25 +1,14 @@
 import mongoose from "mongoose";
 
 const inquirySchema = new mongoose.Schema({
-  idItem: String,
-  idUser: String,
-  description: String,
-  brand: String,
-  type: String,
-  encap: String,
-  ipi: Number,
-  weight: Number,
-  note: String,
-  step: Number,
-  status: String,
-  quantity: Number,
-  unitPurchasePriceInCents: Number,
-  unitSalePriceInCents: Number,
-  idSupplier: String,
-  nameSupplier: String,
-  nameUser: String,
-  idCustomer: String,
-  nameCustomer: String,
+  quantity: { type: Number, required: true, default: 0 },
+  unitPurchasePriceInCents: { type: Number, required: true, default: 0 },
+  unitSalePriceInCents: { type: Number, required: true, default: 0 },
+  idItem: { type: mongoose.Schema.Types.ObjectId, ref: "item", required: true },
+  idUser: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
+  idCustomer: { type: mongoose.Schema.Types.ObjectId, ref: "customer" },
+  idSupplier: { type: mongoose.Schema.Types.ObjectId, ref: "supplier" },
+  createdAt: { type: Date, required: true, default: Date.now() },
 });
 
 const InquiryModel = mongoose.model("inquiry", inquirySchema);

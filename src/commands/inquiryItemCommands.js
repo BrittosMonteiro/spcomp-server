@@ -1,24 +1,12 @@
 export function createInquiryItemCommand(data) {
   const inquiryItem = {
-    idItem: data.id,
-    description: data.description,
-    brand: data.brand,
-    type: data.type,
-    encap: data.encap,
-    ipi: data.ipi,
-    weight: data.weight,
-    note: data.note,
-    step: data.step,
-    status: data.status,
-    quantity: data.quantity,
-    unitPurchasePriceInCents: 0,
-    unitSalePriceInCents: 0,
+    idItem: data.idItem,
     idUser: data.idUser,
-    nameUser: data.nameUser,
-    idSupplier: "",
-    nameSupplier: "",
-    idCustomer: "",
-    nameCustomer: "",
+    idSupplier: data.idSupplier,
+    idCustomer: data.idCustomer,
+    quantity: data.quantity || 0,
+    unitPurchasePriceInCents: data.unitPurchasePrice || 0,
+    unitSalePriceInCents: data.unitSalePrice || 0,
   };
 
   return inquiryItem;
@@ -26,24 +14,44 @@ export function createInquiryItemCommand(data) {
 
 export function readInquiryItemCommand(doc) {
   const inquiryItem = {
-    id: doc._id,
-    idItem: doc.idItem,
-    description: doc.description,
-    brand: doc.brand,
-    type: doc.type,
-    encap: doc.encap,
-    ipi: doc.ipi,
-    weight: doc.weight,
-    note: doc.note,
-    step: doc.step,
-    status: doc.status,
-    quantity: doc.quantity,
-    unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
-    unitSalePrice: doc.unitSalePriceInCents / 100,
-    idUser: doc.idUser,
-    nameUser: doc.nameUser,
-    idCustomer: doc.idCustomer,
-    nameCustomer: doc.nameCustomer,
+    item: {
+      id: doc.idItem._id.toString(),
+      description: doc.idItem.description,
+      brand: doc.idItem.brand,
+      type: doc.idItem.type,
+      encap: doc.idItem.encap,
+      // brand: {
+      //   id: doc.idItem.idBrand._id.toString(),
+      //   description: doc.idItem.idBrand.description,
+      // },
+      // type: {
+      //   id: doc.idItem.idType._id.toString(),
+      //   description: doc.idItem.idType.description,
+      // },
+      // encap: {
+      //   id: doc.idItem.idEncap._id.toString(),
+      //   description: doc.idItem.idEncap.description,
+      // },
+      ipi: doc.idItem.ipi,
+      weight: doc.idItem.weight,
+      note: doc.idItem.note,
+      quantity: doc.idItem.quantity,
+      unitPurchasePrice: doc.idItem.unitPurchasePriceInCents / 100,
+      unitSalePrice: doc.idItem.unitSalePriceInCents / 100,
+    },
+    user: {
+      id: doc.idUser._id.toString(),
+      name: doc.idUser.name,
+    },
+    customer: {
+      id: doc.idCustomer._id.toString(),
+      name: doc.idCustomer.name,
+    },
+    supplier: {
+      id: doc.idSupplier._id.toString(),
+      name: doc.idSupplier.name,
+    },
+    createdAt: new Date(doc.createdAt).toLocaleDateString(),
   };
 
   return inquiryItem;

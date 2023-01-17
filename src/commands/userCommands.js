@@ -1,3 +1,5 @@
+import bcrypt from "bcryptjs";
+
 export function createUserCommnand(data) {
   const user = {
     name: data.name,
@@ -8,7 +10,7 @@ export function createUserCommnand(data) {
     email: `${data.name.toLowerCase().replace(/\s/g, "")}.${data.surname
       .toLowerCase()
       .replace(/\s/g, "")}@spcomponentes.com.br`,
-    password: "teste123",
+    password: bcrypt.hashSync("teste123", 14),
     status: data.status,
     isAdmin: data.role === 1 || false,
     role: data.role,

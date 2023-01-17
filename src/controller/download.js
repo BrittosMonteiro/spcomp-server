@@ -1,7 +1,7 @@
 import xlsx from "xlsx";
 import path from "path";
 
-export async function exportInquiryListToExcel(
+export function exportInquiryListToExcel(
   inquiryList,
   worksheetColumnNames,
   worksheetName
@@ -20,6 +20,10 @@ export async function exportInquiryListToExcel(
   const worksheetData = [worksheetColumnNames, ...data];
   const worksheet = xlsx.utils.aoa_to_sheet(worksheetData);
   xlsx.utils.book_append_sheet(workBook, worksheet, worksheetName);
-  xlsx.writeFile(workBook, path.resolve(`./inquiries/${worksheetName}.xlsx`));
+  xlsx.writeFile(
+    workBook,
+    path.resolve(`./public/inquiries/${worksheetName}.xlsx`)
+  );
+
   return true;
 }

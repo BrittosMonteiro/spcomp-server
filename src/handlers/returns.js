@@ -1,3 +1,11 @@
+export function successData(res, data) {
+  return res.status(200).json({ data: data });
+}
+
+export function successMessage(res, message) {
+  return res.status(200).json({ message: message });
+}
+
 export function created(res, message) {
   return res.status(201).json({ message: message });
 }
@@ -6,12 +14,12 @@ export function createdData(res, data) {
   return res.status(201).json({ data: data });
 }
 
-export function successData(res, data) {
-  return res.status(200).json({ data: data });
+export function noContent(res, message) {
+  return res.status(204).json({ message: message });
 }
 
-export function successMessage(res, message) {
-  return res.status(200).json({ message: message });
+export function accessDenied(res, message) {
+  return res.status(401).json({ message: message });
 }
 
 export function errorNotFound(res, message) {
