@@ -37,10 +37,39 @@ export async function readInquiryItems(req, res) {
   let items = [];
 
   await InquiryModel.find()
-    .populate({ path: "idItem" })
     .populate({ path: "idUser", select: "_id, username" })
-    .populate({ path: "idSupplier", select: "_id, name" })
-    .populate({ path: "idCustomer", select: "_id, name" })
+    .populate({
+      path: "idItem", // 1st level subdoc (get comments)
+      populate: {
+        // 2nd level subdoc (get users in comments)
+        path: "idBrand",
+        select: "description", // space separated (selected fields only)
+      },
+    })
+    .populate({
+      path: "idItem", // 1st level subdoc (get comments)
+      populate: {
+        // 2nd level subdoc (get users in comments)
+        path: "idEncap",
+        select: "description", // space separated (selected fields only)
+      },
+    })
+    .populate({
+      path: "idItem", // 1st level subdoc (get comments)
+      populate: {
+        // 2nd level subdoc (get users in comments)
+        path: "idType",
+        select: "description", // space separated (selected fields only)
+      },
+    })
+    .populate({
+      path: "idSupplier",
+      select: "_id, name",
+    })
+    .populate({
+      path: "idCustomer",
+      select: "_id, name",
+    })
     .exec()
     .then((docs) => {
       if (docs) {
@@ -48,8 +77,7 @@ export async function readInquiryItems(req, res) {
           const data = readInquiryItemCommand(doc);
           items.unshift(data);
         }
-        // return successData(res, items);
-        return res.json(items);
+        return successData(res, { level: 2, items });
       } else {
         return errorCouldNotLoad(res, "Inquiry item could not be loaded");
       }
@@ -81,10 +109,10 @@ export async function readInquiryItemQtyByUser(req, res) {
 }
 
 export async function updateInquiryItem(req, res) {
-  const data = req.body;
+  const { idInquiryItem, data } = req.body;
   const inquiryItem = updateInquiryItemCommand(data);
 
-  await InquiryModel.findByIdAndUpdate(data.id, inquiryItem)
+  await InquiryModel.findByIdAndUpdate(idInquiryItem, inquiryItem)
     .then((response) => {
       if (response) {
         return successMessage(res, "Inquiry item updated");

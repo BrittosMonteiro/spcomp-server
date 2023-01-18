@@ -2,11 +2,9 @@ export function createInquiryItemCommand(data) {
   const inquiryItem = {
     idItem: data.idItem,
     idUser: data.idUser,
-    idSupplier: data.idSupplier,
-    idCustomer: data.idCustomer,
-    quantity: data.quantity || 0,
-    unitPurchasePriceInCents: data.unitPurchasePrice || 0,
-    unitSalePriceInCents: data.unitSalePrice || 0,
+    quantity: 0,
+    unitPurchasePriceInCents: 0,
+    unitSalePriceInCents: 0,
   };
 
   return inquiryItem;
@@ -15,43 +13,43 @@ export function createInquiryItemCommand(data) {
 export function readInquiryItemCommand(doc) {
   const inquiryItem = {
     item: {
-      id: doc.idItem._id.toString(),
-      description: doc.idItem.description,
-      brand: doc.idItem.brand,
-      type: doc.idItem.type,
-      encap: doc.idItem.encap,
-      // brand: {
-      //   id: doc.idItem.idBrand._id.toString(),
-      //   description: doc.idItem.idBrand.description,
-      // },
-      // type: {
-      //   id: doc.idItem.idType._id.toString(),
-      //   description: doc.idItem.idType.description,
-      // },
-      // encap: {
-      //   id: doc.idItem.idEncap._id.toString(),
-      //   description: doc.idItem.idEncap.description,
-      // },
-      ipi: doc.idItem.ipi,
-      weight: doc.idItem.weight,
-      note: doc.idItem.note,
-      quantity: doc.idItem.quantity,
-      unitPurchasePrice: doc.idItem.unitPurchasePriceInCents / 100,
-      unitSalePrice: doc.idItem.unitSalePriceInCents / 100,
+      idInquiryItem: doc._id.toString(),
+      item: {
+        id: doc.idItem._id.toString(),
+        description: doc.idItem.description,
+        brand: {
+          id: doc.idItem.idBrand._id.toString(),
+          description: doc.idItem.idBrand.description,
+        },
+        encap: {
+          id: doc.idItem.idEncap._id.toString(),
+          description: doc.idItem.idEncap.description,
+        },
+        type: {
+          id: doc.idItem.idType._id.toString(),
+          description: doc.idItem.idType.description,
+        },
+        weight: doc.idItem.weight,
+        ipi: doc.idItem.ipi,
+        note: doc.idItem.note,
+        quantity: doc.quantity,
+        unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
+        unitSalePrice: doc.unitSalePriceInCents / 100,
+      },
+      user: {
+        id: doc.idUser._id.toString(),
+        username: doc.idUser.username,
+      },
+      customer: {
+        id: doc.idCustomer ? doc.idCustomer._id.toString() : "",
+        name: doc.idCustomer ? doc.idCustomer.name : "",
+      },
+      supplier: {
+        id: doc.idSupplier ? doc.idSupplier._id.toString() : "",
+        name: doc.idSupplier ? doc.idSupplier.name : "",
+      },
+      createdAt: new Date(doc.createdAt).toLocaleDateString(),
     },
-    user: {
-      id: doc.idUser._id.toString(),
-      name: doc.idUser.name,
-    },
-    customer: {
-      id: doc.idCustomer._id.toString(),
-      name: doc.idCustomer.name,
-    },
-    supplier: {
-      id: doc.idSupplier._id.toString(),
-      name: doc.idSupplier.name,
-    },
-    createdAt: new Date(doc.createdAt).toLocaleDateString(),
   };
 
   return inquiryItem;
@@ -59,15 +57,12 @@ export function readInquiryItemCommand(doc) {
 
 export function updateInquiryItemCommand(data) {
   const inquiryItem = {
+    idCustomer: data.idCustomer,
+    quantity: data.quantity,
+    unitSalePriceInCents: data.unitSalePrice ? data.unitSalePrice * 100 : 0,
     ipi: data.ipi,
     weight: data.weight,
     note: data.note,
-    step: data.step,
-    status: data.status,
-    quantity: data.quantity,
-    unitSalePriceInCents: data.unitSalePrice * 100,
-    idCustomer: data.idCustomer,
-    nameCustomer: data.nameCustomer,
   };
 
   return inquiryItem;

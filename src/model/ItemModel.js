@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema({
-  description: String,
-  brand: String,
-  type: String,
-  encap: String,
-  ipi: String,
-  weight: String,
-  note: String,
+  description: { type: String, required: true },
+  idBrand: { type: mongoose.Schema.Types.ObjectId, ref: "brand" },
+  idType: { type: mongoose.Schema.Types.ObjectId, ref: "type" },
+  idEncap: { type: mongoose.Schema.Types.ObjectId, ref: "encap" },
+  ipi: { type: String, required: false },
+  weight: { type: String, required: false },
+  note: { type: String, required: false },
+  createdAt: { type: Date, required: true, default: Date.now() },
 });
 
 const ItemModel = mongoose.model("item", itemSchema);
