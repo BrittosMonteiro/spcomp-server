@@ -39,27 +39,24 @@ export async function readInquiryItems(req, res) {
   await InquiryModel.find()
     .populate({ path: "idUser", select: "_id, username" })
     .populate({
-      path: "idItem", // 1st level subdoc (get comments)
+      path: "idItem",
       populate: {
-        // 2nd level subdoc (get users in comments)
         path: "idBrand",
-        select: "description", // space separated (selected fields only)
+        select: "description",
       },
     })
     .populate({
-      path: "idItem", // 1st level subdoc (get comments)
+      path: "idItem",
       populate: {
-        // 2nd level subdoc (get users in comments)
         path: "idEncap",
-        select: "description", // space separated (selected fields only)
+        select: "description",
       },
     })
     .populate({
-      path: "idItem", // 1st level subdoc (get comments)
+      path: "idItem",
       populate: {
-        // 2nd level subdoc (get users in comments)
         path: "idType",
-        select: "description", // space separated (selected fields only)
+        select: "description",
       },
     })
     .populate({

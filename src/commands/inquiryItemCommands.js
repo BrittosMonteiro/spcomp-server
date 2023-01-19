@@ -73,7 +73,6 @@ export function updateInquiryItemPriceCommand(data) {
     unitPurchasePriceInCents: data.unitPurchasePrice * 100,
     unitSalePriceInCents: data.unitSalePrice * 100,
     idSupplier: data.idSupplier,
-    nameSupplier: data.nameSupplier,
   };
 
   return inquiryItem;

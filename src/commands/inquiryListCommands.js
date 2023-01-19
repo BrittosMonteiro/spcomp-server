@@ -1,24 +1,44 @@
-export function createInquiryListCommand(doc, idInquiryHistory, items) {
+export function createInquiryListCommand(
+  idSupplier,
+  idInquiryHistory,
+  idInquiryItem
+) {
   const inquiryList = {
-    idInquiryHistory: idInquiryHistory,
-    idSupplier: doc._id.toString(),
-    nameSupplier: doc.name,
-    items: items,
+    idInquiryHistory,
+    idSupplier,
+    idInquiryItem,
+    unitPurchasePriceInCents: 0,
   };
 
   return inquiryList;
 }
 
-export function readInquiryListCommand(doc, idInquiryHistory) {
-  const inquiryList = {
+export function readInquiryListCommand(doc) {
+  const inquiryListItem = {
+    idInquiryItem: doc.idInquiryItem._id.toString(),
+    quantity: doc.idInquiryItem.quantity,
+    description: doc.idInquiryItem.idItem.description,
+    brand: doc.idInquiryItem.idItem.idBrand.description,
+    encap: doc.idInquiryItem.idItem.idEncap.description,
+    type: doc.idInquiryItem.idItem.idType.description,
+    ipi: doc.idInquiryItem.ipi,
+    weight: doc.idInquiryItem.weight,
+    note: doc.idInquiryItem.note,
+    createdAt: doc.idInquiryItem.createdAt,
+    user: doc.idInquiryItem.idUser.username,
+    unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
     idInquiryList: doc._id.toString(),
-    idInquiryHistory,
-    idSupplier: doc.idSupplier,
-    nameSupplier: doc.nameSupplier,
-    items: doc.items,
   };
 
-  return inquiryList;
+  // const inquiryList = {
+  //   idInquiryList: doc._id.toString(),
+  //   inquiryHistory: doc.idInquiryHistory,
+  //   supplier: doc.idSupplier,
+  //   inquiryItem: doc.idInquiryItem,
+  //   unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
+  // };
+
+  return inquiryListItem;
 }
 
 export function readSingleItemFromInquiryListCommand(doc, idInquiryItem) {

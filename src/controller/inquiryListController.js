@@ -6,12 +6,14 @@ import {
 import {
   errorCouldNotLoad,
   errorServiceUnavailable,
+  noContent,
   successData,
   successMessage,
 } from "../handlers/returns.js";
-import SupplierInquiryModel from "../model/supplierInquiryModel.js";
+import InquiryListModel from "../model/inquiryListModel.js";
 import SupplierModel from "../model/supplierModel.js";
 import { exportInquiryListToExcel } from "./download.js";
+import mongoose from "mongoose";
 
 export async function createInquiryList(req, res) {
   const { idInquiryHistory, items } = req.body;
@@ -20,11 +22,17 @@ export async function createInquiryList(req, res) {
   await SupplierModel.find()
     .where("status")
     .equals(true)
-    .then((docs) => {
-      if (docs) {
-        for (let doc of docs) {
-          const data = createInquiryListCommand(doc, idInquiryHistory, items);
-          inquiryList.push(data);
+    .then((suppliers) => {
+      if (suppliers) {
+        for (let supplier of suppliers) {
+          for (let item of items) {
+            const data = createInquiryListCommand(
+              supplier._id.toString(),
+              idInquiryHistory,
+              item
+            );
+            inquiryList.push(data);
+          }
         }
       } else {
         return errorCouldNotLoad(res, "Supplier could not be loaded");
@@ -34,7 +42,7 @@ export async function createInquiryList(req, res) {
       return errorServiceUnavailable(res, err.message);
     });
 
-  await SupplierInquiryModel.insertMany(inquiryList)
+  await InquiryListModel.insertMany(inquiryList)
     .then((response) => {
       if (response) {
         return successMessage(res, "Inquiry created");
@@ -53,24 +61,89 @@ export async function createInquiryList(req, res) {
 export async function readInquiryList(req, res) {
   const { idInquiryHistory } = req.params;
   let inquiryList = [];
+  let suppliersList = [];
 
-  await SupplierInquiryModel.find()
-    .where("idInquiryHistory")
-    .equals(idInquiryHistory)
-    .then((docs) => {
-      if (docs) {
-        for (let doc of docs) {
-          const data = readInquiryListCommand(doc, idInquiryHistory);
-          inquiryList.unshift(data);
+  await SupplierModel.find()
+    .then((response) => {
+      if (response) {
+        for (let supplier of response) {
+          const data = {
+            idSupplier: supplier._id.toString(),
+            name: supplier.name,
+          };
+          suppliersList.push(data);
         }
-        return successData(res, inquiryList);
-      } else {
-        return errorCouldNotLoad(res, "Inquiry list could not be loaded");
       }
     })
-    .catch((err) => {
-      return errorCouldNotLoad(res, err.message);
-    });
+    .catch((err) => {});
+
+  if (suppliersList.length > 0) {
+    for (let supplier of suppliersList) {
+      await InquiryListModel.find()
+        .where("idInquiryHistory")
+        .equals(idInquiryHistory)
+        .where("idSupplier")
+        .equals(supplier.idSupplier)
+        .populate({ path: "idSupplier", select: "name" })
+        .populate({ path: "idInquiryHistory", select: "title status" })
+        .populate({
+          path: "idInquiryItem",
+          select: "quantity idItem idUser idCustomer",
+          populate: {
+            path: "idUser idCustomer idItem",
+            select: "description idBrand idEncap idType username name",
+          },
+        })
+        .populate({
+          path: "idInquiryItem",
+          select: "quantity idItem idUser idCustomer",
+          populate: {
+            path: "idItem",
+            populate: {
+              path: "idBrand",
+            },
+          },
+        })
+        .populate({
+          path: "idInquiryItem",
+          select: "quantity idItem idUser idCustomer",
+          populate: {
+            path: "idItem",
+            populate: {
+              path: "idEncap",
+            },
+          },
+        })
+        .populate({
+          path: "idInquiryItem",
+          select: "quantity idItem idUser idCustomer",
+          populate: {
+            path: "idItem",
+            populate: {
+              path: "idType",
+            },
+          },
+        })
+        .then((docs) => {
+          if (docs) {
+            let items = [];
+            for (let doc of docs) {
+              const item = readInquiryListCommand(doc);
+              items.push(item);
+            }
+            inquiryList.push({ supplier, idInquiryHistory, items });
+          } else {
+            return errorCouldNotLoad(res, "Inquiry list could not be loaded");
+          }
+        })
+        .catch((err) => {
+          return errorCouldNotLoad(res, err.message);
+        });
+    }
+    return successData(res, inquiryList);
+  } else {
+    return noContent(res, "No content to be loaded");
+  }
 }
 
 export async function readInquiryListToDownload(req, res) {
@@ -85,7 +158,7 @@ export async function readInquiryListToDownload(req, res) {
   ];
   let inquiryList = [];
 
-  await SupplierInquiryModel.find()
+  await InquiryListModel.find()
     .where("idInquiryHistory")
     .equals(idInquiryHistory)
     .then((docs) => {
@@ -112,20 +185,67 @@ export async function readInquiryListByCompany(req, res) {
   const { idInquiryHistory, idSupplier } = req.params;
   let inquiryList = [];
 
-  await SupplierInquiryModel.findOne()
+  await InquiryListModel.find()
     .where("idInquiryHistory")
     .equals(idInquiryHistory)
     .where("idSupplier")
     .equals(idSupplier)
-    .then((doc) => {
-      if (doc) {
-        const data = readInquiryListCommand(doc, idInquiryHistory);
-        inquiryList.unshift(data);
-        return successData(res, inquiryList);
+    .populate({ path: "idSupplier", select: "name" })
+    .populate({ path: "idInquiryHistory", select: "title status" })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer",
+      populate: {
+        path: "idUser idCustomer idItem",
+        select: "description idBrand idEncap idType username name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idBrand",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idEncap",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idType",
+        },
+      },
+    })
+    .then((docs) => {
+      if (docs) {
+        for (let doc of docs) {
+          const data = readInquiryListCommand(doc);
+          inquiryList.unshift(data);
+        }
+        return successData(res, {
+          supplier: { idSupplier },
+          items: inquiryList,
+        });
+      } else {
+        return errorCouldNotLoad(res, "History list could not be loaded");
       }
     })
     .catch((err) => {
-      return res.json({ errorMessage: err, status: 404 });
+      return errorServiceUnavailable(res, err.message);
     });
 }
 
@@ -133,7 +253,7 @@ export async function readSingleItemFromInquiryList(req, res) {
   const { idInquiryItem } = req.params;
   let inquiryList = [];
 
-  await SupplierInquiryModel.find()
+  await InquiryListModel.find()
     .where("item.idInquiryItem")
     .equals(idInquiryItem)
     .then((docs) => {
@@ -155,42 +275,20 @@ export async function readSingleItemFromInquiryList(req, res) {
 }
 
 export async function updateInquiryList(req, res) {
-  const { idInquiryList, idInquiryItem, unitPurchasePrice } = req.body;
+  const data = req.body;
+  const idInquiryItem = data.idInquiryItem;
+  const unitPurchasePrice = data.unitPurchasePrice;
 
-  await SupplierInquiryModel.findById(idInquiryList)
-    .then((response) => {
-      if (response) {
-        let index = response.items.findIndex(
-          (e) => e.idInquiryItem === idInquiryItem
-        );
-        let newItem = response.items[index];
-        newItem.unitPurchasePrice = unitPurchasePrice;
+  console.log(idInquiryItem);
+  console.log(unitPurchasePrice);
 
-        SupplierInquiryModel.findByIdAndUpdate(idInquiryList, response)
-          .then((response) => {
-            if (response) {
-              return successMessage(res, "Inquiry list updated");
-            } else {
-              return errorCouldNotLoad(
-                res,
-                "Inquiry list could not be updated"
-              );
-            }
-          })
-          .catch((err) => {
-            return errorServiceUnavailable(res, err.message);
-          });
-      }
-    })
-    .catch((err) => {
-      return errorServiceUnavailable(res, err.message);
-    });
+  return;
 }
 
 export async function deleteInquiryList(req, res) {
   const { idInquiryList } = req.body;
 
-  await SupplierInquiryModel.findByIdAndDelete(idInquiryList)
+  await InquiryListModel.findByIdAndDelete(idInquiryList)
     .then((response) => {
       if (response) {
         return successMessage(res, "Inquiry list deleted");
