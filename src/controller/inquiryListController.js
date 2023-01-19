@@ -236,10 +236,12 @@ export async function readInquiryListByCompany(req, res) {
           const data = readInquiryListCommand(doc);
           inquiryList.unshift(data);
         }
-        return successData(res, {
-          supplier: { idSupplier },
-          items: inquiryList,
-        });
+        return successData(res, [
+          {
+            supplier: { idSupplier },
+            items: inquiryList,
+          },
+        ]);
       } else {
         return errorCouldNotLoad(res, "History list could not be loaded");
       }
@@ -275,14 +277,21 @@ export async function readSingleItemFromInquiryList(req, res) {
 }
 
 export async function updateInquiryList(req, res) {
-  const data = req.body;
-  const idInquiryItem = data.idInquiryItem;
-  const unitPurchasePrice = data.unitPurchasePrice;
+  const { idInquiryList, purchasePrice } = req.body;
 
-  console.log(idInquiryItem);
-  console.log(unitPurchasePrice);
-
-  return;
+  await InquiryListModel.findByIdAndUpdate(idInquiryList, {
+    unitPurchasePriceInCents: purchasePrice * 100,
+  })
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Price updated");
+      } else {
+        return errorServiceUnavailable(res, "Price could not be updated");
+      }
+    })
+    .catch((err) => {
+      return errorCouldNotLoad(res, err.message);
+    });
 }
 
 export async function deleteInquiryList(req, res) {
