@@ -145,41 +145,6 @@ export async function readInquiryList(req, res) {
   }
 }
 
-export async function readInquiryListToDownload(req, res) {
-  const { idInquiryHistory, title } = req.body;
-  const worksheetColumnNames = [
-    "Quantity",
-    "Type",
-    "Description",
-    "Encap",
-    "Brand",
-    "Price USD",
-  ];
-  let inquiryList = [];
-
-  await InquiryListModel.find()
-    .where("idInquiryHistory")
-    .equals(idInquiryHistory)
-    .then((docs) => {
-      for (let item of docs[0].items) {
-        const data = {
-          quantity: item.quantity,
-          type: item.type,
-          description: item.description,
-          encap: item.encap,
-          brand: item.brand,
-          unitPurchasePrice: 0,
-        };
-        inquiryList.push(data);
-      }
-      exportInquiryListToExcel(inquiryList, worksheetColumnNames, title);
-      return res.download(`./public/inquiries/${title}.xlsx`);
-    })
-    .catch((err) => {
-      return errorServiceUnavailable(res, err.message);
-    });
-}
-
 export async function readInquiryListByCompany(req, res) {
   const { idInquiryHistory, idSupplier } = req.params;
   let inquiryList = [];
@@ -255,15 +220,66 @@ export async function readSingleItemFromInquiryList(req, res) {
   let inquiryList = [];
 
   await InquiryListModel.find()
-    .where("item.idInquiryItem")
+    .where("idInquiryItem")
     .equals(idInquiryItem)
+    .sort({ idSupplier: "asc" })
+    .populate({ path: "idSupplier", select: "name" })
+    .populate({ path: "idInquiryHistory", select: "title status" })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer",
+      populate: {
+        path: "idUser idCustomer idItem",
+        select: "description idBrand idEncap idType username name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idBrand",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idEncap",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idType",
+        },
+      },
+    })
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
-          const data = readSingleItemFromInquiryListCommand(doc, idInquiryItem);
-          if (data.item.length > 0) {
-            inquiryList.unshift(data);
-          }
+          const data = readInquiryListCommand(doc);
+          const supplier = {
+            idSupplier: doc.idSupplier._id,
+            name: doc.idSupplier.name,
+          };
+          console.log(supplier);
+          inquiryList.push({
+            supplier,
+            inquiryHistory: {
+              idInquiryHistory: doc.idInquiryHistory._id.toString(),
+              title: doc.idInquiryHistory.title,
+            },
+            items: [data],
+          });
         }
         return successData(res, inquiryList);
       } else {
@@ -305,6 +321,41 @@ export async function deleteInquiryList(req, res) {
       } else {
         return errorCouldNotLoad(res, "Inquiry list could not be deleted");
       }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
+}
+
+export async function readInquiryListToDownload(req, res) {
+  const { idInquiryHistory, title } = req.body;
+  const worksheetColumnNames = [
+    "Quantity",
+    "Type",
+    "Description",
+    "Encap",
+    "Brand",
+    "Price USD",
+  ];
+  let inquiryList = [];
+
+  await InquiryListModel.find()
+    .where("idInquiryHistory")
+    .equals(idInquiryHistory)
+    .then((docs) => {
+      for (let item of docs[0].items) {
+        const data = {
+          quantity: item.quantity,
+          type: item.type,
+          description: item.description,
+          encap: item.encap,
+          brand: item.brand,
+          unitPurchasePrice: 0,
+        };
+        inquiryList.push(data);
+      }
+      exportInquiryListToExcel(inquiryList, worksheetColumnNames, title);
+      return res.download(`./public/inquiries/${title}.xlsx`);
     })
     .catch((err) => {
       return errorServiceUnavailable(res, err.message);
