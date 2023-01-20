@@ -29,15 +29,6 @@ export function readInquiryListCommand(doc) {
     unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
     idInquiryList: doc._id.toString(),
   };
-
-  // const inquiryList = {
-  //   idInquiryList: doc._id.toString(),
-  //   inquiryHistory: doc.idInquiryHistory,
-  //   supplier: doc.idSupplier,
-  //   inquiryItem: doc.idInquiryItem,
-  //   unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
-  // };
-
   return inquiryListItem;
 }
 

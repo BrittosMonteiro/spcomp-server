@@ -13,7 +13,6 @@ import {
 import InquiryListModel from "../model/inquiryListModel.js";
 import SupplierModel from "../model/supplierModel.js";
 import { exportInquiryListToExcel } from "./download.js";
-import mongoose from "mongoose";
 
 export async function createInquiryList(req, res) {
   const { idInquiryHistory, items } = req.body;
@@ -277,10 +276,12 @@ export async function readSingleItemFromInquiryList(req, res) {
 }
 
 export async function updateInquiryList(req, res) {
-  const { idInquiryList, purchasePrice } = req.body;
+  const data = req.body;
+  const idInquiryList = data.idInquiryList;
+  const unitPurchasePriceInCents = data.purchasePrice * 100;
 
   await InquiryListModel.findByIdAndUpdate(idInquiryList, {
-    unitPurchasePriceInCents: purchasePrice * 100,
+    unitPurchasePriceInCents,
   })
     .then((response) => {
       if (response) {
