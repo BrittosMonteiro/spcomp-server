@@ -271,7 +271,6 @@ export async function readSingleItemFromInquiryList(req, res) {
             idSupplier: doc.idSupplier._id,
             name: doc.idSupplier.name,
           };
-          console.log(supplier);
           inquiryList.push({
             supplier,
             inquiryHistory: {
