@@ -1,21 +1,25 @@
-import { createPurchaseCommand } from "../commands/purchaseCommands.js";
+import {
+  createOrderCommand,
+  readOrderCommand,
+} from "../commands/orderCommands.js";
 import {
   created,
   errorCouldNotLoad,
   errorServiceUnavailable,
   noContent,
+  successData,
   successMessage,
 } from "../handlers/returns.js";
-import PurchaseItemModel from "../model/purchaseModel.js";
+import OrderItemModel from "../model/orderModel.js";
 
-export async function createPurchase(req, res) {
+export async function createOrder(req, res) {
   const idInquiryItem = req.body;
 
   if (!idInquiryItem) {
     return noContent(res, "No content");
   }
 
-  await new PurchaseItemModel(idInquiryItem)
+  await new OrderItemModel(idInquiryItem)
     .save()
     .then((response) => {
       if (response) {
@@ -27,10 +31,10 @@ export async function createPurchase(req, res) {
     });
 }
 
-export async function readPurchase(req, res) {
-  let items = [];
+export async function readOrder(req, res) {
+  let purchaseList = [];
 
-  await PurchaseItemModel.find()
+  await OrderItemModel.find()
     .populate({
       path: "idInquiryItem",
       populate: {
@@ -87,7 +91,11 @@ export async function readPurchase(req, res) {
     })
     .then((docs) => {
       if (docs) {
-        return res.json(docs);
+        for (let doc of docs) {
+          const data = readOrderCommand(doc);
+          purchaseList.push(data);
+        }
+        return successData(res, purchaseList);
       }
     })
     .catch((err) => {
@@ -95,12 +103,67 @@ export async function readPurchase(req, res) {
     });
 }
 
-export async function readSinglePurchase(req, res) {}
+export async function readOrderByUser(req, res) {
+  const { idUser } = req.params;
+  console.log(idUser);
 
-export async function updatePurchase(req, res) {
+  await OrderItemModel.find({ idUser: idUser })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idCustomer",
+        select: "name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idBrand",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idEncap",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idType",
+        },
+      },
+    })
+    .then((docs) => {
+      if (docs) {
+        return res.json(docs);
+      }
+    })
+    .catch((err) => {
+      return res.json(err.message);
+    });
+}
+
+export async function readSingleOrder(req, res) {}
+
+export async function updateOrder(req, res) {
   const data = req.body;
 
-  const updateItem = await PurchaseItemModel.findByIdAndUpdate(data.id, {
+  const updateItem = await OrderItemModel.findByIdAndUpdate(data.id, {
     idInquiry: data.id,
     idItem: data.idItem,
     description: data.description,
@@ -118,10 +181,10 @@ export async function updatePurchase(req, res) {
   });
 }
 
-export async function deletePurchase(req, res) {
+export async function deleteOrder(req, res) {
   const { idInquiryItem } = req.body;
 
-  await PurchaseItemModel.findByIdAndDelete(idInquiryItem)
+  await OrderItemModel.findByIdAndDelete(idInquiryItem)
     .then((response) => {
       if (response) {
         return successMessage(res, "Purchase deleted");
