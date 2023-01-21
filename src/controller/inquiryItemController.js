@@ -144,6 +144,29 @@ export async function updateInquiryItemPrice(req, res) {
   return;
 }
 
+export async function updateInquiryItemStep(req, res) {
+  const { pending, step } = req.body;
+
+  await InquiryModel.updateMany(
+    { _id: { $in: pending } },
+    { $set: { step: step } },
+    { multi: true }
+  )
+    .then((response) => {
+      if (response) {
+        return successMessage(req, "Inquiry item step updated");
+      } else {
+        return errorServiceUnavailable(
+          req,
+          "Inquiry item step could not be updated"
+        );
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
+}
+
 export async function deleteInquiryItem(req, res) {
   const { idInquiryItem } = req.body;
 

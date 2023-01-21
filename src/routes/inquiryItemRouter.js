@@ -7,6 +7,7 @@ import {
   readInquiryItemQtyByUser,
   updateInquiryItem,
   updateInquiryItemPrice,
+  updateInquiryItemStep,
   deleteInquiryItem,
 } from "../controller/inquiryItemController.js";
 
@@ -14,6 +15,7 @@ InquiryItemRouter.post("/", createInquiryItem);
 InquiryItemRouter.get("/", readInquiryItems);
 InquiryItemRouter.get("/qtyByUser/:idUser", readInquiryItemQtyByUser);
 InquiryItemRouter.put("/", updateInquiryItem);
+InquiryItemRouter.put("/updateStep", updateInquiryItemStep);
 InquiryItemRouter.put("/updateInquiryItemPrice", updateInquiryItemPrice);
 InquiryItemRouter.delete("/", deleteInquiryItem);
 

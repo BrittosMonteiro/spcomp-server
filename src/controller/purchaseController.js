@@ -1,20 +1,29 @@
 import { createPurchaseCommand } from "../commands/purchaseCommands.js";
+import {
+  created,
+  errorCouldNotLoad,
+  errorServiceUnavailable,
+  noContent,
+  successMessage,
+} from "../handlers/returns.js";
 import PurchaseItemModel from "../model/purchaseModel.js";
 
 export async function createPurchase(req, res) {
-  const data = req.body;
-  const purchaseItem = createPurchaseCommand(data);
+  const idInquiryItem = req.body;
 
-  await new PurchaseItemModel(purchaseItem)
+  if (!idInquiryItem) {
+    return noContent(res, "No content");
+  }
+
+  await new PurchaseItemModel(idInquiryItem)
     .save()
     .then((response) => {
       if (response) {
-        console.log(response);
-        return;
+        return created(res, "Purchase set");
       }
     })
     .catch((err) => {
-      console.log(err);
+      return errorServiceUnavailable(res, err.message);
     });
 }
 
@@ -22,16 +31,62 @@ export async function readPurchase(req, res) {
   let items = [];
 
   await PurchaseItemModel.find()
-    .populate({ path: "idInquiryItem" })
-    .populate({ path: "idUser", select: "_id, username" })
-    .populate({ path: "idCustomer", select: "_id, name" })
-    .populate({ path: "idSupplier", select: "_id, name" })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idUser",
+        select: "name username",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idCustomer",
+        select: "name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idSupplier",
+        select: "name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idBrand",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idEncap",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idType",
+        },
+      },
+    })
     .then((docs) => {
       if (docs) {
-        // for (let doc of docs) {
-        //   const data = {};
-        //   items.unshift(data);
-        // }
         return res.json(docs);
       }
     })
@@ -64,9 +119,17 @@ export async function updatePurchase(req, res) {
 }
 
 export async function deletePurchase(req, res) {
-  const { id } = req.body;
+  const { idInquiryItem } = req.body;
 
-  const remove = await PurchaseItemModel.findByIdAndDelete(id);
-
-  return res.send(remove);
+  await PurchaseItemModel.findByIdAndDelete(idInquiryItem)
+    .then((response) => {
+      if (response) {
+        return successMessage(res, "Purchase deleted");
+      } else {
+        return errorCouldNotLoad(res, "Purchase could not be deleted");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
 }

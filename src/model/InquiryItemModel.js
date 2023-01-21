@@ -9,6 +9,7 @@ const inquirySchema = new mongoose.Schema({
   idCustomer: { type: mongoose.Schema.Types.ObjectId, ref: "customer" },
   idSupplier: { type: mongoose.Schema.Types.ObjectId, ref: "supplier" },
   createdAt: { type: Date, required: true, default: Date.now() },
+  step: { type: Number, required: true, default: 0 },
 });
 
 const InquiryModel = mongoose.model("inquiry", inquirySchema);

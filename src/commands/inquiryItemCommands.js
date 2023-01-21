@@ -33,6 +33,7 @@ export function readInquiryItemCommand(doc) {
         ipi: doc.idItem.ipi,
         note: doc.idItem.note,
         quantity: doc.quantity,
+        step: doc.step,
         unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
         unitSalePrice: doc.unitSalePriceInCents / 100,
       },
@@ -63,6 +64,7 @@ export function updateInquiryItemCommand(data) {
     ipi: data.ipi,
     weight: data.weight,
     note: data.note,
+    step: data.step,
   };
 
   return inquiryItem;
