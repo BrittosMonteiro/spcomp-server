@@ -105,7 +105,6 @@ export async function readOrder(req, res) {
 
 export async function readOrderByUser(req, res) {
   const { idUser } = req.params;
-  console.log(idUser);
 
   await OrderItemModel.find({ idUser: idUser })
     .populate({

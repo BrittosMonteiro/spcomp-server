@@ -20,11 +20,23 @@ import UserRouter from "./src/routes/usersRouter.js";
 import LoginRouter from "./src/routes/loginRouter.js";
 import SupplierRoute from "./src/routes/supplierRouter.js";
 import CustomerRoute from "./src/routes/customerRouter.js";
+import OrderListRouter from "./src/routes/orderListRouter.js";
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+
+const whitelist = ["http://localhost:3000"];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  })
+);
 
 app.use("/item", item);
 app.use("/inquiryItem", InquiryItemRouter);
@@ -39,6 +51,7 @@ app.use("/users", UserRouter);
 app.use("/login", LoginRouter);
 app.use("/supplier", SupplierRoute);
 app.use("/customer", CustomerRoute);
+app.use("/orderList", OrderListRouter);
 
 try {
   mongoose.connect(`${CONNECT}/${CONNECTDB}`);

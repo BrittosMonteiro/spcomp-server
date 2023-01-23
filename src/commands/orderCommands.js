@@ -24,7 +24,7 @@ export function readOrderCommand(doc) {
       step: doc.idInquiryItem.step,
       quantity: doc.idInquiryItem.quantity,
       unitPurchasePrice: doc.idInquiryItem.unitPurchasePriceInCents / 100,
-      unitSalePrice: doc.idInquiryItemunitSalePriceInCents / 100,
+      unitSalePrice: doc.idInquiryItem.unitSalePriceInCents / 100,
     },
     customer: {
       name: doc.idInquiryItem.idCustomer.name,
