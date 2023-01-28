@@ -12,7 +12,7 @@ import InquiryItemRouter from "./src/routes/inquiryItemRouter.js";
 import inquiryHistoryRouter from "./src/routes/inquiryHistoryRouter.js";
 import InquiryListRouter from "./src/routes/inquiryListRouter.js";
 import orderRouter from "./src/routes/orderRouter.js";
-import StockRouter from "./src/routes/stock.js";
+import StockRouter from "./src/routes/stockRouter.js";
 import BrandRouter from "./src/routes/brandRouter.js";
 import TypeRouter from "./src/routes/typeRouter.js";
 import EncapRouter from "./src/routes/encapRouter.js";
@@ -26,17 +26,18 @@ const app = express();
 
 app.use(express.json());
 
-const whitelist = ["http://localhost:3000"];
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1) {
-        callback(null, true);
-      }
-    },
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  })
-);
+// const whitelist = ["http://localhost:3000", "0.0.0.0"];
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       if (whitelist.indexOf(origin) !== -1) {
+//         callback(null, true);
+//       }
+//     },
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//   })
+// );
+app.use(cors());
 
 app.use("/item", item);
 app.use("/inquiryItem", InquiryItemRouter);

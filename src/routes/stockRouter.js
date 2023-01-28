@@ -1,18 +1,15 @@
 import express from "express";
 import {
+  createStockItem,
+  readStockList,
+  updateStockItem,
   deleteStockItem,
-  getStockItemList,
-  postStockItem,
-  putStockItem,
 } from "../controller/stockController.js";
 const StockRouter = express.Router();
 
-StockRouter.post("/", postStockItem);
-
-StockRouter.get("/", getStockItemList);
-
-StockRouter.put("/", putStockItem);
-
+StockRouter.post("/", createStockItem);
+StockRouter.get("/", readStockList);
+StockRouter.put("/", updateStockItem);
 StockRouter.delete("/", deleteStockItem);
 
 export default StockRouter;

@@ -1,66 +1,101 @@
+import { readStockItemCommand } from "../commands/stockCommands.js";
+import {
+  created,
+  errorServiceUnavailable,
+  successData,
+} from "../handlers/returns.js";
 import StockModel from "../model/stockModel.js";
 
-export async function postStockItem(req, res) {
+export async function createStockItem(req, res) {
   const data = req.body;
 
-  const stockModel = new StockModel({
-    idItem: data.idItem,
-    idInquiry: data.idInquiry,
-    idPurchase: data.id,
-    description: data.description,
-    brand: data.brand,
-    type: data.type,
-    encap: data.encap,
-    ipi: data.ipi,
-    weight: data.weight,
-    note: data.note,
-    step: data.step,
-    status: data.status,
-    quantity: data.quantity,
-    unitPurchasePriceInCents: data.unitPurchasePrice * 100,
-    unitSalePriceInCents: data.unitSalePrice * 100,
-  });
-
-  const create = await stockModel.save();
-
-  return res.send(create);
+  await new StockModel({ idInquiryItem: data.idInquiryItem })
+    .save()
+    .then((responseCreate) => {
+      if (responseCreate) {
+        return created(res, "Item sent to stock");
+      } else {
+        return errorServiceUnavailable(res, "Item could no be sent to stock");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
 }
 
-export async function getStockItemList(req, res) {
+export async function readStockList(req, res) {
   let items = [];
 
   await StockModel.find()
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idUser",
+        select: "name username",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idCustomer",
+        select: "name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idSupplier",
+        select: "name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idBrand",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idEncap",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idType",
+        },
+      },
+    })
     .then((docs) => {
-      for (let doc of docs) {
-        const data = {
-          id: doc._id,
-          idItem: doc.idItem,
-          idInquiry: doc.idInquiry,
-          idPurchase: doc.idPurchase,
-          description: doc.description,
-          brand: doc.brand,
-          type: doc.type,
-          encap: doc.encap,
-          ipi: doc.ipi,
-          weight: doc.weight,
-          note: doc.note,
-          step: doc.step,
-          status: doc.status,
-          quantity: doc.quantity,
-          unitPurchasePrice: doc.unitPurchasePriceInCents / 100,
-          unitSalePrice: doc.unitSalePriceInCents / 100,
-        };
-        items.unshift(data);
+      if (docs) {
+        for (let doc of docs) {
+          const data = readStockItemCommand(doc);
+          items.unshift(data);
+        }
+        return successData(res, items);
       }
     })
     .catch((err) => {
       console.log(err);
     });
-
-  return res.json(items);
 }
 
-export async function putStockItem(req, res) {}
+export async function updateStockItem(req, res) {}
 
 export async function deleteStockItem(req, res) {
   const { id } = req.body;

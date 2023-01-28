@@ -1,7 +1,4 @@
-import {
-  createOrderCommand,
-  readOrderCommand,
-} from "../commands/orderCommands.js";
+import { readOrderCommand } from "../commands/orderCommands.js";
 import {
   created,
   errorCouldNotLoad,
@@ -162,22 +159,17 @@ export async function readSingleOrder(req, res) {}
 export async function updateOrder(req, res) {
   const data = req.body;
 
-  const updateItem = await OrderItemModel.findByIdAndUpdate(data.id, {
-    idInquiry: data.id,
-    idItem: data.idItem,
-    description: data.description,
-    brand: data.brand,
-    type: data.type,
-    encap: data.encap,
-    ipi: data.ipi,
-    weight: data.weight,
-    note: data.note,
-    step: data.step,
-    status: data.status,
-    quantity: data.quantity,
-    unitPurchasePriceInCents: data.unitPurchasePrice * 100,
-    unitSalePriceInCents: data.unitSalePrice * 100,
-  });
+  await OrderItemModel.findByIdAndUpdate(data.idOrder, {
+    reason: data.reason,
+  })
+    .then((responseUpdate) => {
+      if (responseUpdate) {
+        return successMessage(res, "Order item reason set");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 export async function deleteOrder(req, res) {
