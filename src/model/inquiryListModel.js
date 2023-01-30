@@ -5,9 +5,8 @@ const inquiryListSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "inquiryHistory",
   },
-  idSupplier: { type: mongoose.Schema.Types.ObjectId, ref: "supplier" },
   idInquiryItem: { type: mongoose.Schema.Types.ObjectId, ref: "inquiry" },
-  unitPurchasePriceInCents: { type: Number, required: false, default: 0 },
+  prices: [],
 });
 
 const InquiryListModel = mongoose.model("inquiryList", inquiryListSchema);

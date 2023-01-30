@@ -1,7 +1,7 @@
 import {
-  createInquiryListCommand,
-  readInquiryListCommand,
-  readSingleItemFromInquiryListCommand,
+  readInquiryListByHistoryId,
+  readInquiryListByInquiryId,
+  readInquiryListByCompanyCommand,
 } from "../commands/inquiryListCommands.js";
 import {
   errorCouldNotLoad,
@@ -23,15 +23,25 @@ export async function createInquiryList(req, res) {
     .equals(true)
     .then((suppliers) => {
       if (suppliers) {
-        for (let supplier of suppliers) {
-          for (let item of items) {
-            const data = createInquiryListCommand(
-              supplier._id.toString(),
-              idInquiryHistory,
-              item
-            );
-            inquiryList.push(data);
+        for (let item of items) {
+          let suppliersList = [];
+          for (let supplier of suppliers) {
+            const data = {
+              idSupplier: supplier._id,
+              name: supplier.name,
+              unitPurchasePriceInCents: 0,
+              leadtime: "",
+              datacode: "",
+              condition: "",
+            };
+            suppliersList.push(data);
           }
+          const data = {
+            idInquiryHistory,
+            idInquiryItem: item,
+            prices: suppliersList,
+          };
+          inquiryList.push(data);
         }
       } else {
         return errorCouldNotLoad(res, "Supplier could not be loaded");
@@ -60,102 +70,13 @@ export async function createInquiryList(req, res) {
 export async function readInquiryList(req, res) {
   const { idInquiryHistory } = req.params;
   let inquiryList = [];
-  let suppliersList = [];
-
-  await SupplierModel.find()
-    .then((response) => {
-      if (response) {
-        for (let supplier of response) {
-          const data = {
-            idSupplier: supplier._id.toString(),
-            name: supplier.name,
-          };
-          suppliersList.push(data);
-        }
-      }
-    })
-    .catch((err) => {});
-
-  if (suppliersList.length > 0) {
-    for (let supplier of suppliersList) {
-      await InquiryListModel.find()
-        .where("idInquiryHistory")
-        .equals(idInquiryHistory)
-        .where("idSupplier")
-        .equals(supplier.idSupplier)
-        .populate({ path: "idSupplier", select: "name" })
-        .populate({ path: "idInquiryHistory", select: "title status" })
-        .populate({
-          path: "idInquiryItem",
-          select: "quantity idItem idUser idCustomer",
-          populate: {
-            path: "idUser idCustomer idItem",
-            select: "description idBrand idEncap idType username name",
-          },
-        })
-        .populate({
-          path: "idInquiryItem",
-          select: "quantity idItem idUser idCustomer",
-          populate: {
-            path: "idItem",
-            populate: {
-              path: "idBrand",
-            },
-          },
-        })
-        .populate({
-          path: "idInquiryItem",
-          select: "quantity idItem idUser idCustomer",
-          populate: {
-            path: "idItem",
-            populate: {
-              path: "idEncap",
-            },
-          },
-        })
-        .populate({
-          path: "idInquiryItem",
-          select: "quantity idItem idUser idCustomer",
-          populate: {
-            path: "idItem",
-            populate: {
-              path: "idType",
-            },
-          },
-        })
-        .then((docs) => {
-          if (docs) {
-            let items = [];
-            for (let doc of docs) {
-              const item = readInquiryListCommand(doc);
-              items.push(item);
-            }
-            inquiryList.push({ supplier, idInquiryHistory, items });
-          } else {
-            return errorCouldNotLoad(res, "Inquiry list could not be loaded");
-          }
-        })
-        .catch((err) => {
-          return errorCouldNotLoad(res, err.message);
-        });
-    }
-    return successData(res, inquiryList);
-  } else {
-    return noContent(res, "No content to be loaded");
-  }
-}
-
-export async function readInquiryListByCompany(req, res) {
-  const { idInquiryHistory, idSupplier } = req.params;
-  let inquiryList = [];
 
   await InquiryListModel.find()
     .where("idInquiryHistory")
     .equals(idInquiryHistory)
-    .where("idSupplier")
-    .equals(idSupplier)
-    .populate({ path: "idSupplier", select: "name" })
-    .populate({ path: "idInquiryHistory", select: "title status" })
+    .populate({
+      path: "idInquiryHistory",
+    })
     .populate({
       path: "idInquiryItem",
       select: "quantity idItem idUser idCustomer",
@@ -194,20 +115,94 @@ export async function readInquiryListByCompany(req, res) {
         },
       },
     })
+    .then((responseRead) => {
+      if (responseRead) {
+        for (let doc of responseRead) {
+          const data = readInquiryListByHistoryId(doc);
+          for (let price of doc.prices) {
+            price = {
+              ...price,
+              name: price.name,
+              unitPurchasePrice: price.unitPurchasePriceInCents / 100,
+              leadtime: price.leadtime,
+              datacode: price.datacode,
+              condition: price.condition,
+            };
+            data.prices.push(price);
+          }
+          inquiryList.push(data);
+        }
+        return successData(res, inquiryList);
+      }
+    });
+}
+
+export async function readInquiryListByCompany(req, res) {
+  const { idInquiryHistory, idSupplier } = req.params;
+  let inquiryList = [];
+
+  await InquiryListModel.find()
+    .where("idInquiryHistory")
+    .equals(idInquiryHistory)
+    .populate({ path: "idInquiryHistory", select: "title status" })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer step",
+      populate: {
+        path: "idUser idCustomer idItem",
+        select: "description idBrand idEncap idType username name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer step",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idBrand",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer step",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idEncap",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      select: "quantity idItem idUser idCustomer step",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idType",
+        },
+      },
+    })
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
-          const data = readInquiryListCommand(doc);
-          inquiryList.unshift(data);
+          const data = readInquiryListByCompanyCommand(doc);
+          const price = doc.prices.filter(
+            (e) => e.idSupplier.toString() === idSupplier
+          );
+          data.prices.push({
+            idSupplier: price[0].idSupplier,
+            name: price[0].name,
+            unitPurchasePrice: price[0].unitPurchasePriceInCents / 100,
+            leadtime: price[0].leadtime,
+            datacode: price[0].datacode,
+            condition: price[0].condition,
+          });
+          inquiryList.push(data);
         }
-        return successData(res, [
-          {
-            supplier: { idSupplier },
-            items: inquiryList,
-          },
-        ]);
+        return successData(res, inquiryList);
       } else {
-        return errorCouldNotLoad(res, "History list could not be loaded");
+        return noContent(res, "History list could not be loaded");
       }
     })
     .catch((err) => {
@@ -222,12 +217,10 @@ export async function readSingleItemFromInquiryList(req, res) {
   await InquiryListModel.find()
     .where("idInquiryItem")
     .equals(idInquiryItem)
-    .sort({ idSupplier: "asc" })
-    .populate({ path: "idSupplier", select: "name" })
     .populate({ path: "idInquiryHistory", select: "title status" })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer",
+      select: "quantity idItem idUser idCustomer step",
       populate: {
         path: "idUser idCustomer idItem",
         select: "description idBrand idEncap idType username name",
@@ -235,7 +228,7 @@ export async function readSingleItemFromInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer",
+      select: "quantity idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -245,7 +238,7 @@ export async function readSingleItemFromInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer",
+      select: "quantity idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -255,7 +248,7 @@ export async function readSingleItemFromInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer",
+      select: "quantity idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -266,19 +259,10 @@ export async function readSingleItemFromInquiryList(req, res) {
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
-          const data = readInquiryListCommand(doc);
-          const supplier = {
-            idSupplier: doc.idSupplier._id,
-            name: doc.idSupplier.name,
-          };
-          inquiryList.push({
-            supplier,
-            inquiryHistory: {
-              idInquiryHistory: doc.idInquiryHistory._id.toString(),
-              title: doc.idInquiryHistory.title,
-            },
-            items: [data],
-          });
+          for (let price of doc.prices) {
+            const data = readInquiryListByInquiryId(doc, price);
+            inquiryList.push(data);
+          }
         }
         return successData(res, inquiryList);
       } else {
@@ -292,21 +276,44 @@ export async function readSingleItemFromInquiryList(req, res) {
 
 export async function updateInquiryList(req, res) {
   const data = req.body;
-  const idInquiryList = data.idInquiryList;
-  const unitPurchasePriceInCents = data.purchasePrice * 100;
 
-  await InquiryListModel.findByIdAndUpdate(idInquiryList, {
-    unitPurchasePriceInCents,
-  })
-    .then((response) => {
-      if (response) {
-        return successMessage(res, "Price updated");
+  await InquiryListModel.findById(data.idInquiryList)
+    .then((responseFind) => {
+      if (responseFind) {
+        manageInquiryListItemUpdate(responseFind, data.price, res);
       } else {
-        return errorServiceUnavailable(res, "Price could not be updated");
+        return noContent(res, "Não foi possível alterar");
       }
     })
     .catch((err) => {
-      return errorCouldNotLoad(res, err.message);
+      return errorServiceUnavailable(res, err.message);
+    });
+}
+
+export async function manageInquiryListItemUpdate(item, data, res) {
+  const pos = item.prices.findIndex(
+    (e) => e.idSupplier.toString() === data.idSupplier
+  );
+
+  console.log(item.prices[pos]);
+  item.prices[pos] = {
+    ...item.prices[pos],
+    unitPurchasePriceInCents: data.unitPurchasePrice * 100,
+    leadtime: data.leadtime,
+    datacode: data.datacode,
+    condition: data.condition,
+  };
+
+  await InquiryListModel.findByIdAndUpdate(item._id, item)
+    .then((responseUpdate) => {
+      if (responseUpdate) {
+        return successMessage(res, "Item updated");
+      } else {
+        return noContent(res, "Item could not be updated");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
     });
 }
 
