@@ -20,6 +20,8 @@ export async function createOrderListItem(req, res) {
   await InquiryModel.find()
     .where("idSupplier")
     .equals(idSupplier)
+    .where("step")
+    .equals(4)
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
@@ -53,7 +55,6 @@ export async function createOrderListItem(req, res) {
 
 export async function readOrderList(req, res) {
   const { idOrder } = req.params;
-  let items = [];
 
   await OrderListModel.findById(idOrder)
     .populate({
@@ -263,7 +264,7 @@ export async function readOrderListBySupplier(req, res) {
           orderList.push(data);
         }
         const orderListFiltered = orderList.filter(
-          (e) => e.idSupplier === idSupplier
+          (e) => e.idSupplier === idSupplier && e.status === true
         );
         return successData(res, orderListFiltered);
       } else {
@@ -370,9 +371,9 @@ export async function updateOrderStatus(req, res) {
 }
 
 export async function deleteOrderListItem(req, res) {
-  const { idInquiryItem } = req.body;
+  const { idOrder } = req.body;
 
-  await OrderListModel.deleteOne({ idInquiryItem: idInquiryItem })
+  await OrderListModel.findByIdAndDelete(idOrder)
     .then((responseDelete) => {
       if (responseDelete) {
         return successMessage(res, "Order item from suppliers's list deleted");

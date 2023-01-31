@@ -79,7 +79,7 @@ export async function readInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer",
+      select: "quantity idItem idUser idCustomer step",
       populate: {
         path: "idUser idCustomer idItem",
         select: "description idBrand idEncap idType username name",
@@ -87,7 +87,7 @@ export async function readInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer",
+      select: "quantity idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -97,7 +97,7 @@ export async function readInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer",
+      select: "quantity idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -107,7 +107,7 @@ export async function readInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer",
+      select: "quantity idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
