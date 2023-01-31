@@ -43,7 +43,7 @@ export function readOrderCommand(doc) {
   return orderItem;
 }
 
-export function readOrderListByCompanyCommand(doc) {
+export function readOrderListBySupplierCommand(doc) {
   const orderItem = {
     idOrder: doc._id.toString(),
     item: {

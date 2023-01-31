@@ -28,3 +28,12 @@ export function readSuppliersCommand(doc) {
 
   return supplier;
 }
+
+export function readSupplierSimpleCommand(doc) {
+  const supplier = {
+    idSupplier: doc._id.toString(),
+    name: doc.name,
+  };
+
+  return supplier;
+}

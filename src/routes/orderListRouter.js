@@ -2,19 +2,23 @@ import express from "express";
 import {
   createOrderListItem,
   readOrderList,
-  readOrderListByCompany,
+  readOrders,
+  readOrderListBySupplier,
   readOrderListByUser,
-  deleteOrderListItem,
   readOrderListByStock,
+  updateOrderStatus,
+  deleteOrderListItem,
 } from "../controller/orderListController.js";
 const OrderListRouter = express.Router();
 
 OrderListRouter.post("/", createOrderListItem);
-OrderListRouter.get("/all", readOrderList);
-OrderListRouter.get("/byCompany/:idCompany", readOrderListByCompany);
+OrderListRouter.get("/order/:idOrder", readOrderList);
+OrderListRouter.get("/orders", readOrders);
+OrderListRouter.get("/bySupplier/:idSupplier", readOrderListBySupplier);
 OrderListRouter.get("/byUser/:idUser", readOrderListByUser);
 OrderListRouter.get("/stock", readOrderListByStock);
 OrderListRouter.put("/");
+OrderListRouter.put("/updateStatus", updateOrderStatus);
 OrderListRouter.delete("/", deleteOrderListItem);
 
 export default OrderListRouter;

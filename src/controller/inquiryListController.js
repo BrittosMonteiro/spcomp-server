@@ -295,7 +295,6 @@ export async function manageInquiryListItemUpdate(item, data, res) {
     (e) => e.idSupplier.toString() === data.idSupplier
   );
 
-  console.log(item.prices[pos]);
   item.prices[pos] = {
     ...item.prices[pos],
     unitPurchasePriceInCents: data.unitPurchasePrice * 100,

@@ -1,11 +1,13 @@
 import {
   createSupplierCommand,
   readSuppliersCommand,
+  readSupplierSimpleCommand,
 } from "../commands/supplierCommands.js";
 import {
   created,
   errorNotFound,
   errorServiceUnavailable,
+  noContent,
   successData,
   successMessage,
 } from "../handlers/returns.js";
@@ -46,6 +48,27 @@ export async function readSuppliers(req, res) {
     })
     .catch((err) => {
       return errorNotFound(res, err.message);
+    });
+}
+
+export async function readSupplierSimple(req, res) {
+  let suppliersList = [];
+
+  await SupplierModel.find()
+    .sort({ name: "asc" })
+    .then((docs) => {
+      if (docs) {
+        for (let doc of docs) {
+          const data = readSupplierSimpleCommand(doc);
+          suppliersList.push(data);
+        }
+        return successData(res, suppliersList);
+      } else {
+        return noContent(res, "Supplier could not be loaded");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
     });
 }
 

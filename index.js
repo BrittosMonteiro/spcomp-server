@@ -11,7 +11,7 @@ import item from "./src/routes/itemRouter.js";
 import InquiryItemRouter from "./src/routes/inquiryItemRouter.js";
 import inquiryHistoryRouter from "./src/routes/inquiryHistoryRouter.js";
 import InquiryListRouter from "./src/routes/inquiryListRouter.js";
-import orderRouter from "./src/routes/orderRouter.js";
+import orderRouter from "./src/routes/requestRouter.js";
 import StockRouter from "./src/routes/stockRouter.js";
 import BrandRouter from "./src/routes/brandRouter.js";
 import TypeRouter from "./src/routes/typeRouter.js";

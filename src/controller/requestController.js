@@ -1,4 +1,4 @@
-import { readOrderCommand } from "../commands/orderCommands.js";
+import { readOrderCommand } from "../commands/OrderCommands.js";
 import {
   created,
   errorCouldNotLoad,
@@ -7,16 +7,16 @@ import {
   successData,
   successMessage,
 } from "../handlers/returns.js";
-import OrderItemModel from "../model/orderModel.js";
+import RequestItemModel from "../model/requestModel.js";
 
-export async function createOrder(req, res) {
+export async function createRequest(req, res) {
   const idInquiryItem = req.body;
 
   if (!idInquiryItem) {
     return noContent(res, "No content");
   }
 
-  await new OrderItemModel(idInquiryItem)
+  await new RequestItemModel(idInquiryItem)
     .save()
     .then((response) => {
       if (response) {
@@ -28,10 +28,10 @@ export async function createOrder(req, res) {
     });
 }
 
-export async function readOrder(req, res) {
+export async function readRequest(req, res) {
   let purchaseList = [];
 
-  await OrderItemModel.find()
+  await RequestItemModel.find()
     .populate({
       path: "idInquiryItem",
       populate: {
@@ -100,10 +100,10 @@ export async function readOrder(req, res) {
     });
 }
 
-export async function readOrderByUser(req, res) {
+export async function readRequestByUser(req, res) {
   const { idUser } = req.params;
 
-  await OrderItemModel.find({ idUser: idUser })
+  await RequestItemModel.find({ idUser: idUser })
     .populate({
       path: "idInquiryItem",
       populate: {
@@ -154,17 +154,17 @@ export async function readOrderByUser(req, res) {
     });
 }
 
-export async function readSingleOrder(req, res) {}
+export async function readSingleRequest(req, res) {}
 
-export async function updateOrder(req, res) {
+export async function updateRequest(req, res) {
   const data = req.body;
 
-  await OrderItemModel.findByIdAndUpdate(data.idOrder, {
+  await RequestItemModel.findByIdAndUpdate(data.idRequest, {
     reason: data.reason,
   })
     .then((responseUpdate) => {
       if (responseUpdate) {
-        return successMessage(res, "Order item reason set");
+        return successMessage(res, "Request item reason set");
       }
     })
     .catch((err) => {
@@ -172,10 +172,10 @@ export async function updateOrder(req, res) {
     });
 }
 
-export async function deleteOrder(req, res) {
+export async function deleteRequest(req, res) {
   const { idInquiryItem } = req.body;
 
-  await OrderItemModel.findByIdAndDelete(idInquiryItem)
+  await RequestItemModel.findByIdAndDelete(idInquiryItem)
     .then((response) => {
       if (response) {
         return successMessage(res, "Purchase deleted");
