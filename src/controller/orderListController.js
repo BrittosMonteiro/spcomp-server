@@ -12,6 +12,7 @@ import {
 } from "../handlers/returns.js";
 import InquiryModel from "../model/InquiryItemModel.js";
 import OrderListModel from "../model/orderListModel.js";
+import { updateOrderInquiryItemStep } from "./inquiryItemController.js";
 
 export async function createOrderListItem(req, res) {
   const { idSupplier } = req.body;
@@ -43,6 +44,13 @@ export async function createOrderListItem(req, res) {
     .save()
     .then((responseCreate) => {
       if (responseCreate) {
+        updateOrderInquiryItemStep(itemsList, 5);
+      } else {
+        return noContent(res, "Order could not be created");
+      }
+    })
+    .then((response) => {
+      if (response) {
         return created(res, "Order created");
       } else {
         return errorCouldNotLoad(res, "Order could not be created");
@@ -363,6 +371,36 @@ export async function updateOrderStatus(req, res) {
         return successMessage(res, "Order status updated");
       } else {
         return noContent(res, "Order status could not be updated");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
+}
+
+export async function updateOrderAddItems(req, res) {
+  const { idOrder, items } = req.body;
+
+  await OrderListModel.findById(idOrder)
+    .then((responseRead) => {
+      if (responseRead) {
+        for (let id of responseRead.items) {
+          items.unshift(id.toString());
+        }
+        OrderListModel.findByIdAndUpdate(idOrder, { items })
+          .then((responseUpdate) => {
+            if (responseUpdate) {
+              updateOrderInquiryItemStep(items, 5);
+              return successMessage(res, "Updated");
+            } else {
+              return noContent(res, "Could not update");
+            }
+          })
+          .catch((err) => {
+            return errorServiceUnavailable(res, err.message);
+          });
+      } else {
+        return errorServiceUnavailable(res, "Item could not be included");
       }
     })
     .catch((err) => {

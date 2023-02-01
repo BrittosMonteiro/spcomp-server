@@ -10,6 +10,9 @@ const inquirySchema = new mongoose.Schema({
   idSupplier: { type: mongoose.Schema.Types.ObjectId, ref: "supplier" },
   createdAt: { type: Date, required: true, default: Date.now() },
   step: { type: Number, required: true, default: 0 },
+  leadtime: { type: String, required: true },
+  datacode: { type: String, required: true },
+  condition: { type: String, required: true },
 });
 
 const InquiryModel = mongoose.model("inquiry", inquirySchema);

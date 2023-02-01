@@ -170,6 +170,16 @@ export async function updateInquiryItemStep(req, res) {
     });
 }
 
+export async function updateOrderInquiryItemStep(items, step) {
+  await InquiryModel.updateMany(
+    { _id: { $in: items } },
+    { $set: { step: step } },
+    { multi: true }
+  ).then(() => {
+    return;
+  });
+}
+
 export async function deleteInquiryItem(req, res) {
   const { idInquiryItem } = req.body;
 

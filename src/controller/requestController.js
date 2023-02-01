@@ -100,6 +100,97 @@ export async function readRequest(req, res) {
     });
 }
 
+export async function readRequestBySupplier(req, res) {
+  const { idSupplier } = req.params;
+  let requestList = [];
+
+  await RequestItemModel.find()
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idUser",
+        select: "name username",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idCustomer",
+        select: "name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idSupplier",
+        select: "name",
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idBrand",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idEncap",
+        },
+      },
+    })
+    .populate({
+      path: "idInquiryItem",
+      populate: {
+        path: "idItem",
+        populate: {
+          path: "idType",
+        },
+      },
+    })
+    .then((docs) => {
+      if (docs) {
+        for (let doc of docs) {
+          const data = {
+            idInquiryItem: doc.idInquiryItem._id.toString(),
+            description: doc.idInquiryItem.idItem.description,
+            quantity: doc.idInquiryItem.quantity,
+            unitPurchasePrice: doc.idInquiryItem.unitPurchasePriceInCents / 100,
+            unitSalePrice: doc.idInquiryItem.unitSalePriceInCents / 100,
+            step: doc.idInquiryItem.step,
+            supplier: {
+              idSupplier: doc.idInquiryItem.idSupplier._id.toString(),
+              name: doc.idInquiryItem.idSupplier.name,
+            },
+            customer: {
+              idCustomer: doc.idInquiryItem.idCustomer._id.toString(),
+              name: doc.idInquiryItem.idCustomer.name,
+            },
+          };
+          requestList.push(data);
+        }
+        const requestListFiltered = requestList.filter(
+          (e) => e.supplier.idSupplier === idSupplier && e.step === 4
+        );
+        return successData(res, requestListFiltered);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
 export async function readRequestByUser(req, res) {
   const { idUser } = req.params;
 

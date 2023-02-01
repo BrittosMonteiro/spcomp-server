@@ -7,6 +7,7 @@ import {
   readOrderListByUser,
   readOrderListByStock,
   updateOrderStatus,
+  updateOrderAddItems,
   deleteOrderListItem,
 } from "../controller/orderListController.js";
 const OrderListRouter = express.Router();
@@ -19,6 +20,7 @@ OrderListRouter.get("/byUser/:idUser", readOrderListByUser);
 OrderListRouter.get("/stock", readOrderListByStock);
 OrderListRouter.put("/");
 OrderListRouter.put("/updateStatus", updateOrderStatus);
+OrderListRouter.put("/updateOrderAddItems", updateOrderAddItems);
 OrderListRouter.delete("/", deleteOrderListItem);
 
 export default OrderListRouter;
