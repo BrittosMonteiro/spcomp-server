@@ -11,45 +11,28 @@ import {
   successMessage,
 } from "../handlers/returns.js";
 import InquiryListModel from "../model/inquiryListModel.js";
-import SupplierModel from "../model/supplierModel.js";
 import { exportInquiryListToExcel } from "./download.js";
 
 export async function createInquiryList(req, res) {
-  const { idInquiryHistory, items } = req.body;
+  const { idInquiryHistory, selectedSuppliers, items } = req.body;
   const inquiryList = [];
 
-  await SupplierModel.find()
-    .where("status")
-    .equals(true)
-    .then((suppliers) => {
-      if (suppliers) {
-        for (let item of items) {
-          let suppliersList = [];
-          for (let supplier of suppliers) {
-            const data = {
-              idSupplier: supplier._id,
-              name: supplier.name,
-              unitPurchasePriceInCents: 0,
-              leadtime: "",
-              datacode: "",
-              condition: "",
-            };
-            suppliersList.push(data);
-          }
-          const data = {
-            idInquiryHistory,
-            idInquiryItem: item,
-            prices: suppliersList,
-          };
-          inquiryList.push(data);
-        }
-      } else {
-        return errorCouldNotLoad(res, "Supplier could not be loaded");
+  for (let item of items) {
+    if (selectedSuppliers) {
+      for (let supplier of selectedSuppliers) {
+        supplier.unitPurchasePriceInCents = 0;
+        supplier.leadtime = "";
+        supplier.datacode = "";
+        supplier.condition = "";
       }
-    })
-    .catch((err) => {
-      return errorServiceUnavailable(res, err.message);
-    });
+      const data = {
+        idInquiryHistory,
+        idInquiryItem: item,
+        prices: selectedSuppliers,
+      };
+      inquiryList.push(data);
+    }
+  }
 
   await InquiryListModel.insertMany(inquiryList)
     .then((response) => {
@@ -79,7 +62,8 @@ export async function readInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idUser idCustomer idItem",
         select: "description idBrand idEncap idType username name",
@@ -87,7 +71,8 @@ export async function readInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -97,7 +82,8 @@ export async function readInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -107,7 +93,8 @@ export async function readInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -147,7 +134,8 @@ export async function readInquiryListByCompany(req, res) {
     .populate({ path: "idInquiryHistory", select: "title status" })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idUser idCustomer idItem",
         select: "description idBrand idEncap idType username name",
@@ -155,7 +143,8 @@ export async function readInquiryListByCompany(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -165,7 +154,8 @@ export async function readInquiryListByCompany(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -175,7 +165,8 @@ export async function readInquiryListByCompany(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -220,7 +211,8 @@ export async function readSingleItemFromInquiryList(req, res) {
     .populate({ path: "idInquiryHistory", select: "title status" })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idUser idCustomer idItem",
         select: "description idBrand idEncap idType username name",
@@ -228,7 +220,8 @@ export async function readSingleItemFromInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -238,7 +231,8 @@ export async function readSingleItemFromInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {
@@ -248,7 +242,8 @@ export async function readSingleItemFromInquiryList(req, res) {
     })
     .populate({
       path: "idInquiryItem",
-      select: "quantity idItem idUser idCustomer step",
+      select:
+        "quantity leadtime condition datacode idItem idUser idCustomer step",
       populate: {
         path: "idItem",
         populate: {

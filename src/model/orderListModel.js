@@ -11,6 +11,9 @@ const orderListSchema = new mongoose.Schema({
   ],
   createdAt: { type: Date, required: true, default: Date.now() },
   status: { type: Boolean, required: true, default: false },
+  idImportHistory: {
+    type: String,
+  },
 });
 
 const OrderListModel = mongoose.model("orderList", orderListSchema);

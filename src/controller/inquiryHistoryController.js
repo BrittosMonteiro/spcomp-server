@@ -57,6 +57,7 @@ export async function readInquiryHistory(req, res) {
 }
 
 export async function readActiveInquiryHistory(req, res) {
+  const { idSupplier } = req.params;
   let inquiryHistoryList = [];
 
   await InquiryHistoryModel.find()
@@ -65,8 +66,10 @@ export async function readActiveInquiryHistory(req, res) {
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
-          const inquiryHistory = readInquiryHistoryCommand(doc);
-          inquiryHistoryList.unshift(inquiryHistory);
+          const inquiryHistory = readInquiryHistoryCommand(doc, idSupplier);
+          if (inquiryHistory) {
+            inquiryHistoryList.unshift(inquiryHistory);
+          }
         }
         return successData(res, inquiryHistoryList);
       } else {

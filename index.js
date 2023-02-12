@@ -21,6 +21,7 @@ import LoginRouter from "./src/routes/loginRouter.js";
 import SupplierRoute from "./src/routes/supplierRouter.js";
 import CustomerRoute from "./src/routes/customerRouter.js";
 import OrderListRouter from "./src/routes/orderListRouter.js";
+import ImportsHistoryRouter from "./src/routes/importsHistory.js";
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use("/login", LoginRouter);
 app.use("/supplier", SupplierRoute);
 app.use("/customer", CustomerRoute);
 app.use("/orderList", OrderListRouter);
+app.use("/importHistory", ImportsHistoryRouter);
 
 try {
   mongoose.connect(`${CONNECT}/${CONNECTDB}`);

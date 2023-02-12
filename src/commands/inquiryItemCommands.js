@@ -5,6 +5,9 @@ export function createInquiryItemCommand(data) {
     quantity: 0,
     unitPurchasePriceInCents: 0,
     unitSalePriceInCents: 0,
+    leadtime: data.leadtime,
+    datacode: data.datacode,
+    condition: data.condition,
   };
 
   return inquiryItem;
@@ -75,6 +78,9 @@ export function updateInquiryItemPriceCommand(data) {
     unitPurchasePriceInCents: data.unitPurchasePrice * 100,
     unitSalePriceInCents: data.unitSalePrice * 100,
     idSupplier: data.idSupplier,
+    leadtime: data.leadtime,
+    datacode: data.datacode,
+    condition: data.condition,
   };
 
   return inquiryItem;

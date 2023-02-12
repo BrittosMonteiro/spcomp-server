@@ -11,7 +11,7 @@ import {
 
 InquiryHistoryRouter.post("/", createInquiryHistory);
 InquiryHistoryRouter.get("/", readInquiryHistory);
-InquiryHistoryRouter.get("/active", readActiveInquiryHistory);
+InquiryHistoryRouter.get("/active/:idSupplier", readActiveInquiryHistory);
 InquiryHistoryRouter.put("/", updateInquiryHistory);
 InquiryHistoryRouter.delete("/", deleteInquiryHistory);
 

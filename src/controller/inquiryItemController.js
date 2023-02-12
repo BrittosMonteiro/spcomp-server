@@ -154,19 +154,16 @@ export async function updateInquiryItemStep(req, res) {
   )
     .then((response) => {
       if (response) {
-        return res.json({ message: "atualizado" });
-        // return successMessage(req, "Inquiry item step updated");
+        return successMessage(res, "Inquiry item step updated");
       } else {
-        return res.json({ message: "Não atualizado" });
-        // return errorServiceUnavailable(
-        //   req,
-        //   "Inquiry item step could not be updated"
-        // );
+        return errorServiceUnavailable(
+          res,
+          "Inquiry item step could not be updated"
+        );
       }
     })
     .catch((err) => {
-      return res.json({ message: "Não atualizado" });
-      // return errorServiceUnavailable(res, err.message);
+      return errorServiceUnavailable(res, err.message);
     });
 }
 

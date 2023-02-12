@@ -71,7 +71,8 @@ export async function readOrderList(req, res) {
     })
     .populate({
       path: "items",
-      select: "quantity unitPurchasePriceInCents idItem step",
+      select:
+        "quantity leadtime condition datacode unitPurchasePriceInCents idItem step",
       populate: {
         path: "idItem",
         select: "description idType idEncap idBrand",
@@ -83,7 +84,8 @@ export async function readOrderList(req, res) {
     })
     .populate({
       path: "items",
-      select: "quantity unitPurchasePriceInCents idItem step",
+      select:
+        "quantity leadtime condition datacode unitPurchasePriceInCents idItem step",
       populate: {
         path: "idItem",
         select: "description idType idEncap idBrand",
@@ -95,7 +97,8 @@ export async function readOrderList(req, res) {
     })
     .populate({
       path: "items",
-      select: "quantity unitPurchasePriceInCents idItem step",
+      select:
+        "quantity leadtime condition datacode unitPurchasePriceInCents idItem step",
       populate: {
         path: "idItem",
         select: "description idType idEncap idBrand",
@@ -127,9 +130,9 @@ export async function readOrderList(req, res) {
             encap: item.idItem.idEncap.description,
             brand: item.idItem.idBrand.description,
             step: item.step,
-            leadtime: "",
-            datacode: "",
-            condition: "",
+            leadtime: item.leadtime,
+            datacode: item.datacode,
+            condition: item.condition,
           };
           data.items.push(item);
         }
@@ -362,6 +365,47 @@ export async function readOrderListByStock(req, res) {
     });
 }
 
+export async function readOrdersByImportHistory(req, res) {
+  const { idImportHistory } = req.params;
+
+  await OrderListModel.find()
+    .populate({
+      path: "idSupplier",
+      select: "name",
+    })
+    .where("idImportHistory")
+    .equals(idImportHistory)
+    .then((responseRead) => {
+      if (responseRead) {
+        return successData(res, responseRead);
+      } else {
+        return noContent(res, "No order found");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
+}
+
+export async function readOrdersNotAttached(req, res) {
+  await OrderListModel.find()
+    .populate({
+      path: "idSupplier",
+      select: "name",
+    })
+    .then((responseRead) => {
+      if (responseRead) {
+        const newOrderList = responseRead.filter((e) => !e.idImportHistory);
+        return successData(res, newOrderList);
+      } else {
+        return noContent(res, "No order found");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
+}
+
 export async function updateOrderStatus(req, res) {
   const { idOrder, status } = req.body;
 
@@ -401,6 +445,24 @@ export async function updateOrderAddItems(req, res) {
           });
       } else {
         return errorServiceUnavailable(res, "Item could not be included");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
+}
+
+export async function updateOrderImportHistoryId(req, res) {
+  const { idImportHistory, idOrder } = req.body;
+  console.log(idImportHistory);
+  console.log(idOrder);
+
+  await OrderListModel.findByIdAndUpdate(idOrder, { idImportHistory })
+    .then((responseUpdate) => {
+      if (responseUpdate) {
+        return successMessage(res, "Order now has an import id");
+      } else {
+        return noContent(res, "Could not set import to order");
       }
     })
     .catch((err) => {

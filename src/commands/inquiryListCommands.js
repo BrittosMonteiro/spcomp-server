@@ -38,6 +38,9 @@ export function readInquiryListByInquiryId(doc, price) {
       idSupplier: price.idSupplier.toString(),
       name: price.name,
       unitPurchasePrice: price.unitPurchasePriceInCents / 100,
+      leadtime: price.leadtime,
+      datacode: price.datacode,
+      condition: price.condition,
     },
   };
 
