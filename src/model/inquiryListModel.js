@@ -8,6 +8,7 @@ const inquiryListSchema = new mongoose.Schema({
   idInquiryItem: { type: mongoose.Schema.Types.ObjectId, ref: "inquiry" },
   prices: [],
   isDeleted: { type: Boolean, required: true, default: false },
+  createdAt: { type: Date, required: true, default: Date.now() },
 });
 
 const InquiryListModel = mongoose.model("inquiryList", inquiryListSchema);
