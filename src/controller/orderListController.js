@@ -65,6 +65,8 @@ export async function readOrderList(req, res) {
   const { idOrder } = req.params;
 
   await OrderListModel.findById(idOrder)
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idSupplier",
       select: "name",
@@ -150,6 +152,8 @@ export async function readOrders(req, res) {
   let orders = [];
 
   await OrderListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idSupplier",
       select: "name",
@@ -180,6 +184,8 @@ export async function readOrderListByUser(req, res) {
   let purchaseList = [];
 
   await OrderListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idInquiryItem",
       populate: {
@@ -258,6 +264,8 @@ export async function readOrderListBySupplier(req, res) {
   let orderList = [];
 
   await OrderListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idSupplier",
       select: "name",
@@ -291,6 +299,8 @@ export async function readOrderListByStock(req, res) {
   let purchaseList = [];
 
   await OrderListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idInquiryItem",
       populate: {
@@ -369,6 +379,8 @@ export async function readOrdersByImportHistory(req, res) {
   const { idImportHistory } = req.params;
 
   await OrderListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idSupplier",
       select: "name",
@@ -389,6 +401,8 @@ export async function readOrdersByImportHistory(req, res) {
 
 export async function readOrdersNotAttached(req, res) {
   await OrderListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idSupplier",
       select: "name",
@@ -454,8 +468,6 @@ export async function updateOrderAddItems(req, res) {
 
 export async function updateOrderImportHistoryId(req, res) {
   const { idImportHistory, idOrder } = req.body;
-  console.log(idImportHistory);
-  console.log(idOrder);
 
   await OrderListModel.findByIdAndUpdate(idOrder, { idImportHistory })
     .then((responseUpdate) => {
@@ -473,7 +485,7 @@ export async function updateOrderImportHistoryId(req, res) {
 export async function deleteOrderListItem(req, res) {
   const { idOrder } = req.body;
 
-  await OrderListModel.findByIdAndDelete(idOrder)
+  await OrderListModel.findByIdAndUpdate(idOrder, { isDeleted: true })
     .then((responseDelete) => {
       if (responseDelete) {
         return successMessage(res, "Order item from suppliers's list deleted");

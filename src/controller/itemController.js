@@ -33,6 +33,8 @@ export async function readItems(req, res) {
   let itemsList = [];
 
   await ItemModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({ path: "idBrand", select: "description" })
     .populate({ path: "idType", select: "description" })
     .populate({ path: "idEncap", select: "description" })
@@ -56,6 +58,8 @@ export async function readSingleItem(req, res) {
   const { idItem } = req.params;
 
   await ItemModel.findById(idItem)
+    .where("isDeleted")
+    .equals(false)
     .populate({ path: "idBrand", select: "description" })
     .populate({ path: "idType", select: "description" })
     .populate({ path: "idEncap", select: "description" })
@@ -91,7 +95,7 @@ export async function updateItem(req, res) {
 export async function deleteItem(req, res) {
   const { idItem } = req.body;
 
-  await ItemModel.findByIdAndDelete(idItem)
+  await ItemModel.findByIdAndUpdate(idItem, { isDeleted: true })
     .then((response) => {
       if (response) {
         return successMessage(res, "Item deleted");

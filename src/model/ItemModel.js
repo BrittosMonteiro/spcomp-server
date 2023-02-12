@@ -9,6 +9,7 @@ const itemSchema = new mongoose.Schema({
   weight: { type: String, required: false },
   note: { type: String, required: false },
   createdAt: { type: Date, required: true, default: Date.now() },
+  isDeleted: { type: Boolean, required: true, default: false },
 });
 
 const ItemModel = mongoose.model("item", itemSchema);

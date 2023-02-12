@@ -33,6 +33,7 @@ export function readSupplierSimpleCommand(doc) {
   const supplier = {
     idSupplier: doc._id.toString(),
     name: doc.name,
+    status: doc.status,
   };
 
   return supplier;

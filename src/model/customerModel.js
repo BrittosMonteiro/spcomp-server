@@ -8,6 +8,7 @@ const customerSchema = new mongoose.Schema({
   phone: { type: String, required: false },
   status: { type: Boolean, required: true },
   observation: { type: String, required: false },
+  isDeleted: { type: Boolean, required: true, default: false },
 });
 
 const CustomerModel = mongoose.model("customer", customerSchema);

@@ -30,6 +30,8 @@ export async function readEncap(req, res) {
 
   await EncapModel.find()
     .sort({ description: "asc" })
+    .where("isDeleted")
+    .equals(false)
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
@@ -65,7 +67,7 @@ export async function updateEncap(req, res) {
 export async function deleteEncap(req, res) {
   const { idEncap } = req.body;
 
-  await EncapModel.findByIdAndDelete(idEncap)
+  await EncapModel.findByIdAndUpdate(idEncap, { isDeleted: true })
     .then((response) => {
       if (response) {
         return successMessage(res, "Encap deleted");

@@ -9,6 +9,7 @@ const importsHistorySchema = new mongoose.Schema({
   createdAt: { type: Date, required: true, default: Date.now() },
   status: { type: Boolean, required: true, default: false },
   idOrder: [{ type: mongoose.Schema.Types.ObjectId, ref: "orderList" }],
+  isDeleted: { type: Boolean, required: true, default: false },
 });
 
 const ImportsHistoryModel = mongoose.model(

@@ -1,15 +1,17 @@
 import mongoose from "mongoose";
 
 const supplierSchema = new mongoose.Schema({
-  name: String,
-  contact: String,
-  email: String,
-  password: String,
-  isAdmin: Boolean,
-  status: Boolean,
-  observation: String,
-  role: Number,
-  username: String,
+  name: { type: String, required: true },
+  surname: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  status: { type: Boolean, required: true },
+  isAdmin: { type: Boolean, required: true },
+  role: { type: Number, required: true },
+  contact: { type: String },
+  observation: { type: String },
+  isDeleted: { type: String, required: true, default: false },
 });
 
 const SupplierModel = mongoose.model("supplier", supplierSchema);

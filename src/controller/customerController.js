@@ -32,6 +32,8 @@ export async function readCustomers(req, res) {
 
   await CustomerModel.find()
     .sort({ name: "asc" })
+    .where("isDeleted")
+    .equals(false)
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
@@ -52,6 +54,8 @@ export async function readCustomerById(req, res) {
   const { idCustomer } = req.params;
 
   await CustomerModel.findById(idCustomer)
+    .where("isDeleted")
+    .equals(false)
     .then((doc) => {
       if (doc) {
         const customer = readCustomersCommand(doc);
@@ -71,6 +75,8 @@ export async function readCustomerToItem(req, res) {
   await CustomerModel.find()
     .where("status")
     .equals(true)
+    .where("isDeleted")
+    .equals(false)
     .sort({ name: "asc" })
     .then((docs) => {
       if (docs) {
@@ -109,7 +115,7 @@ export async function updateCustomer(req, res) {
 export async function deleteCustomer(req, res) {
   const { idCustomer } = req.body;
 
-  await CustomerModel.findByIdAndDelete(idCustomer)
+  await CustomerModel.findByIdAndUpdate(idCustomer, { isDeleted: true })
     .then((response) => {
       if (response) {
         return res.status(200).json({ message: "Customer deleted" });

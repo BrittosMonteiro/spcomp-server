@@ -14,6 +14,7 @@ const orderListSchema = new mongoose.Schema({
   idImportHistory: {
     type: String,
   },
+  isDeleted: { type: Boolean, required: true, default: false },
 });
 
 const OrderListModel = mongoose.model("orderList", orderListSchema);

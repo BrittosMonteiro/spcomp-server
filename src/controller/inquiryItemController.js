@@ -37,6 +37,8 @@ export async function readInquiryItems(req, res) {
   let items = [];
 
   await InquiryModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({ path: "idUser", select: "_id, username" })
     .populate({
       path: "idItem",
@@ -180,7 +182,7 @@ export async function updateOrderInquiryItemStep(items, step) {
 export async function deleteInquiryItem(req, res) {
   const { idInquiryItem } = req.body;
 
-  await InquiryModel.findByIdAndDelete(idInquiryItem)
+  await InquiryModel.findByIdAndUpdate(idInquiryItem, { isDeleted: true })
     .then((response) => {
       if (response) {
         return successMessage(res, "Inquiry item deleted");

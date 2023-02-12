@@ -6,6 +6,7 @@ const stockSchema = new mongoose.Schema({
     ref: "inquiry",
   },
   createdAt: { type: Date, required: true, default: Date.now() },
+  isDeleted: { type: Boolean, required: true, default: false },
 });
 
 const StockModel = mongoose.model("stock", stockSchema);

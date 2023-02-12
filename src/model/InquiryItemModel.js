@@ -13,6 +13,7 @@ const inquirySchema = new mongoose.Schema({
   leadtime: { type: String },
   datacode: { type: String },
   condition: { type: String },
+  isDeleted: { type: Boolean, required: true, default: false },
 });
 
 const InquiryModel = mongoose.model("inquiry", inquirySchema);

@@ -30,6 +30,8 @@ export async function readImportHistory(req, res) {
   let importHistoryList = [];
 
   await ImportsHistoryModel.find()
+    .where("isDeleted")
+    .equals(false)
     .then((responseRead) => {
       if (responseRead) {
         for (let doc of responseRead) {
@@ -68,8 +70,10 @@ export async function updateImportHistory(req, res) {
 
 export async function deleteImportHistory(req, res) {
   const { idImportHistory } = req.body;
-  
-  await ImportsHistoryModel.findByIdAndDelete(idImportHistory)
+
+  await ImportsHistoryModel.findByIdAndUpdate(idImportHistory, {
+    isDeleted: true,
+  })
     .then((responseDelete) => {
       if (responseDelete) {
         return successMessage(res, "Import history deleted");

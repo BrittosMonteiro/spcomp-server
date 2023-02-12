@@ -35,6 +35,9 @@ export async function readSuppliers(req, res) {
   let suppliersList = [];
 
   await SupplierModel.find()
+    .where("isDeleted")
+    .equals(false)
+    .sort({ name: "asc" })
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
@@ -55,6 +58,8 @@ export async function readSupplierSimple(req, res) {
   let suppliersList = [];
 
   await SupplierModel.find()
+    .where("isDeleted")
+    .equals(false)
     .sort({ name: "asc" })
     .then((docs) => {
       if (docs) {
@@ -76,6 +81,8 @@ export async function readSupplierById(req, res) {
   const { idSupplier } = req.params;
 
   await SupplierModel.findById(idSupplier)
+    .where("isDeleted")
+    .equals(false)
     .then((response) => {
       if (response) {
         const supplier = readSuppliersCommand(response);
@@ -108,7 +115,7 @@ export async function updateSupplier(req, res) {
 export async function deleteSupplier(req, res) {
   const { idSupplier } = req.body;
 
-  await SupplierModel.findByIdAndDelete(idSupplier)
+  await SupplierModel.findByIdAndUpdate(idSupplier, { isDeleted: true })
     .then((response) => {
       if (response) {
         return successMessage(res, "Supplier deleted");

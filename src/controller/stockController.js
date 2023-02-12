@@ -27,6 +27,8 @@ export async function readStockList(req, res) {
   let items = [];
 
   await StockModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idInquiryItem",
       populate: {
@@ -100,7 +102,7 @@ export async function updateStockItem(req, res) {}
 export async function deleteStockItem(req, res) {
   const { id } = req.body;
 
-  const remove = await StockModel.findByIdAndDelete(id);
+  const remove = await StockModel.findByIdAndUpdate(id, { isDeleted: true });
 
   return res.send(remove);
 }

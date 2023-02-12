@@ -29,6 +29,8 @@ export async function readType(req, res) {
 
   await TypeModel.find()
     .sort({ description: "asc" })
+    .where("isDeleted")
+    .equals(false)
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
@@ -67,7 +69,7 @@ export async function updateType(req, res) {
 export async function deleteType(req, res) {
   const { idType } = req.body;
 
-  await TypeModel.findByIdAndDelete(idType)
+  await TypeModel.findByIdAndUpdate(idType, { isDeleted: true })
     .then((response) => {
       if (response) {
         return successMessage(res, "Type deleted");

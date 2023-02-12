@@ -34,6 +34,8 @@ export async function readUsers(req, res) {
   let usersList = [];
 
   await UserModel.find()
+    .where("isDeleted")
+    .equals(false)
     .sort({ name: "asc" })
     .then((docs) => {
       if (docs) {
@@ -55,6 +57,8 @@ export async function readUserById(req, res) {
   const { idUser } = req.params;
 
   await UserModel.findById(idUser)
+    .where("isDeleted")
+    .equals(false)
     .then((response) => {
       if (response) {
         const user = readUserCommand(response);
@@ -88,7 +92,7 @@ export async function updateUser(req, res) {
 export async function deleteUser(req, res) {
   const { idUser } = req.body;
 
-  await UserModel.findByIdAndDelete(idUser)
+  await UserModel.findByIdAndUpdate(idUser, { isDeleted: true })
     .then((response) => {
       if (response) {
         return successMessage(res, "User deleted");

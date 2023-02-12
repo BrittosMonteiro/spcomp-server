@@ -32,6 +32,8 @@ export async function readRequest(req, res) {
   let purchaseList = [];
 
   await RequestItemModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idInquiryItem",
       populate: {
@@ -105,6 +107,8 @@ export async function readRequestBySupplier(req, res) {
   let requestList = [];
 
   await RequestItemModel.find()
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idInquiryItem",
       populate: {
@@ -195,6 +199,8 @@ export async function readRequestByUser(req, res) {
   const { idUser } = req.params;
 
   await RequestItemModel.find({ idUser: idUser })
+    .where("isDeleted")
+    .equals(false)
     .populate({
       path: "idInquiryItem",
       populate: {
@@ -266,7 +272,7 @@ export async function updateRequest(req, res) {
 export async function deleteRequest(req, res) {
   const { idInquiryItem } = req.body;
 
-  await RequestItemModel.findByIdAndDelete(idInquiryItem)
+  await RequestItemModel.findByIdAndUpdate(idInquiryItem, { isDeleted: true })
     .then((response) => {
       if (response) {
         return successMessage(res, "Purchase deleted");

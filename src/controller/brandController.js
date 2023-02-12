@@ -30,6 +30,8 @@ export async function readBrands(req, res) {
 
   await BrandModel.find()
     .sort({ description: "asc" })
+    .where("isDeleted")
+    .equals(false)
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
@@ -65,7 +67,7 @@ export async function updateBrand(req, res) {
 export async function deleteBrand(req, res) {
   const { idBrand } = req.body;
 
-  await BrandModel.findByIdAndDelete(idBrand)
+  await BrandModel.findByIdAndUpdate(idBrand, { isDeleted: true })
     .then((response) => {
       if (response) {
         return successMessage(res, "Brand deleted");

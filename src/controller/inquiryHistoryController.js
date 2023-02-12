@@ -37,6 +37,8 @@ export async function readInquiryHistory(req, res) {
   let inquiryHistoryList = [];
 
   await InquiryHistoryModel.find()
+    .where("isDeleted")
+    .equals(false)
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
@@ -63,6 +65,8 @@ export async function readActiveInquiryHistory(req, res) {
   await InquiryHistoryModel.find()
     .where("status")
     .equals(true)
+    .where("isDeleted")
+    .equals(false)
     .then((docs) => {
       if (docs) {
         for (let doc of docs) {
@@ -107,7 +111,9 @@ export async function updateInquiryHistory(req, res) {
 export async function deleteInquiryHistory(req, res) {
   const { idInquiryHistory } = req.body;
 
-  await InquiryHistoryModel.findByIdAndDelete(idInquiryHistory)
+  await InquiryHistoryModel.findByIdAndUpdate(idInquiryHistory, {
+    isDeleted: true,
+  })
     .then((response) => {
       if (response) {
         return successMessage(res, "Inquiry history deleted");

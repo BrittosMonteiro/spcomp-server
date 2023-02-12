@@ -55,6 +55,8 @@ export async function readInquiryList(req, res) {
   let inquiryList = [];
 
   await InquiryListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .where("idInquiryHistory")
     .equals(idInquiryHistory)
     .populate({
@@ -129,6 +131,8 @@ export async function readInquiryListByCompany(req, res) {
   let inquiryList = [];
 
   await InquiryListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .where("idInquiryHistory")
     .equals(idInquiryHistory)
     .populate({ path: "idInquiryHistory", select: "title status" })
@@ -206,6 +210,8 @@ export async function readSingleItemFromInquiryList(req, res) {
   let inquiryList = [];
 
   await InquiryListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .where("idInquiryItem")
     .equals(idInquiryItem)
     .populate({ path: "idInquiryHistory", select: "title status" })
@@ -314,7 +320,7 @@ export async function manageInquiryListItemUpdate(item, data, res) {
 export async function deleteInquiryList(req, res) {
   const { idInquiryList } = req.body;
 
-  await InquiryListModel.findByIdAndDelete(idInquiryList)
+  await InquiryListModel.findByIdAndUpdate(idInquiryList, { isDeleted: true })
     .then((response) => {
       if (response) {
         return successMessage(res, "Inquiry list deleted");
@@ -340,6 +346,8 @@ export async function readInquiryListToDownload(req, res) {
   let inquiryList = [];
 
   await InquiryListModel.find()
+    .where("isDeleted")
+    .equals(false)
     .where("idInquiryHistory")
     .equals(idInquiryHistory)
     .then((docs) => {
