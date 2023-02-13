@@ -1,7 +1,7 @@
 import {
   createUserCommnand,
   readUserCommand,
-  upateUserCommand,
+  updateUserCommand,
 } from "../commands/userCommands.js";
 import {
   created,
@@ -74,7 +74,7 @@ export async function readUserById(req, res) {
 
 export async function updateUser(req, res) {
   const { idUser, data } = req.body;
-  const user = upateUserCommand(data);
+  const user = updateUserCommand(data);
 
   await UserModel.findByIdAndUpdate(idUser, user)
     .then((response) => {

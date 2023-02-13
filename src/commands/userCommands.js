@@ -33,7 +33,7 @@ export function readUserCommand(doc) {
   return user;
 }
 
-export function upateUserCommand(data) {
+export function updateUserCommand(data) {
   const user = {
     name: data.name,
     surname: data.surname,
@@ -44,8 +44,8 @@ export function upateUserCommand(data) {
       .toLowerCase()
       .replace(/\s/g, "")}@spcomponentes.com.br`,
     status: data.status,
-    isAdmin: data.role === 1 || false,
     role: data.role,
+    isAdmin: data.role === 1 || false,
   };
 
   return user;
