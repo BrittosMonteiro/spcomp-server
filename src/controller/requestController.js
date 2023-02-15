@@ -1,4 +1,4 @@
-import { readOrderCommand } from "../commands/OrderCommands.js";
+import { readOrderCommand } from "../commands/orderCommands.js";
 import {
   created,
   errorCouldNotLoad,
