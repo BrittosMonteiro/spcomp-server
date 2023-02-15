@@ -53,6 +53,7 @@ export function readInquiryItemCommand(doc) {
         name: doc.idSupplier ? doc.idSupplier.name : "",
       },
       createdAt: new Date(doc.createdAt).toLocaleDateString(),
+      daysLeft: daysLeft(doc.createdAt),
     },
   };
 
@@ -84,4 +85,14 @@ export function updateInquiryItemPriceCommand(data) {
   };
 
   return inquiryItem;
+}
+
+function daysLeft(createdAt) {
+  const today = new Date().toISOString().split("T")[0];
+  const created = new Date(createdAt).toISOString().split("T")[0];
+  const difference = new Date(today) - new Date(created);
+  if (difference > 0) {
+    return difference / (1000 * 60 * 60 * 24);
+  }
+  return difference;
 }

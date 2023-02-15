@@ -14,6 +14,8 @@ export async function loginUser(req, res) {
   await UserModel.findOne()
     .where("username")
     .equals(username.toLowerCase())
+    .where("isDeleted")
+    .equals(false)
     .then((response) => {
       if (response) {
         const comparePass = bcrypt.compareSync(password, response.password);

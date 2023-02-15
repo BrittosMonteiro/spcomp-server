@@ -140,7 +140,7 @@ export async function readOrderList(req, res) {
         }
         return successData(res, data);
       } else {
-        return errorCouldNotLoad(req, "Could not load");
+        return errorCouldNotLoad(res, "Could not load");
       }
     })
     .catch((err) => {
@@ -171,7 +171,7 @@ export async function readOrders(req, res) {
         }
         return successData(res, orders);
       } else {
-        return errorCouldNotLoad(req, "Could not load");
+        return errorCouldNotLoad(res, "Could not load");
       }
     })
     .catch((err) => {
@@ -251,7 +251,7 @@ export async function readOrderListByUser(req, res) {
         );
         return successData(res, purchaseListFiltered);
       } else {
-        return errorCouldNotLoad(req, "Could not load");
+        return errorCouldNotLoad(res, "Could not load");
       }
     })
     .catch((err) => {
@@ -287,7 +287,7 @@ export async function readOrderListBySupplier(req, res) {
         );
         return successData(res, orderListFiltered);
       } else {
-        return errorCouldNotLoad(req, "Could not load");
+        return errorCouldNotLoad(res, "Could not load");
       }
     })
     .catch((err) => {
@@ -367,7 +367,7 @@ export async function readOrderListByStock(req, res) {
         );
         return successData(res, purchaseListFiltered);
       } else {
-        return errorCouldNotLoad(req, "Could not load");
+        return errorCouldNotLoad(res, "Could not load");
       }
     })
     .catch((err) => {
