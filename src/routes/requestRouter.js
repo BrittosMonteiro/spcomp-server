@@ -9,7 +9,7 @@ import {
   readSingleRequest,
   updateRequest,
   deleteRequest,
-} from "../controller/RequestController.js";
+} from "../controller/requestController.js";
 
 RequestRouter.post("/", createRequest);
 RequestRouter.get("/", readRequest);
