@@ -13,6 +13,13 @@ export async function loginUser(req, res) {
   const { username, password } = req.body;
   console.log(username, password);
 
+  const user = await UserModel.findOne({
+    username: username.toLowerCase(),
+    isDeleted: false,
+  });
+
+  console.log(user);
+
   await UserModel.findOne()
     .where("username")
     .equals(username.toLowerCase())
