@@ -27,18 +27,18 @@ const app = express();
 
 app.use(express.json());
 
-// const whitelist = ["http://localhost:3000", "0.0.0.0"];
-// app.use(
-//   cors({
-//     origin: function (origin, callback) {
-//       if (whitelist.indexOf(origin) !== -1) {
-//         callback(null, true);
-//       }
-//     },
-//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-//   })
-// );
-app.use(cors());
+const whitelist = ["https://spcomp-v2.vercel.app", "http://localhost:3000"];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  })
+);
+// app.use(cors());
 
 app.use("/item", item);
 app.use("/inquiryItem", InquiryItemRouter);
@@ -54,7 +54,7 @@ app.use("/login", LoginRouter);
 app.use("/supplier", SupplierRoute);
 app.use("/customer", CustomerRoute);
 app.use("/orderList", OrderListRouter);
-app.use("/importHistory", ImportsHistoryRouter);
+app.use("/importsHistory", ImportsHistoryRouter);
 
 try {
   mongoose.connect(`${CONNECT}/${CONNECTDB}`);
