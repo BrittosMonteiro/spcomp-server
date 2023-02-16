@@ -57,6 +57,7 @@ app.use("/orderList", OrderListRouter);
 app.use("/importsHistory", ImportsHistoryRouter);
 
 try {
+  mongoose.set("strictQuery", true);
   mongoose.connect(`${CONNECT}/${CONNECTDB}`);
 } catch (err) {
   console.log(err);
