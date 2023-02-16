@@ -2,6 +2,7 @@ import { loginCommand } from "../commands/loginCommands.js";
 import {
   errorNotFound,
   errorServiceUnavailable,
+  noContent,
   successData,
 } from "../handlers/returns.js";
 import UserModel from "../model/userModel.js";
@@ -26,7 +27,7 @@ export async function loginUser(req, res) {
           return errorNotFound(res, "Username or password incorrect");
         }
       } else {
-        return errorNotFound(res, "Username or password incorrect");
+        return noContent(res, "Could not connect");
       }
     })
     .catch((err) => {
