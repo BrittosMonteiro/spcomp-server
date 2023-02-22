@@ -12,7 +12,7 @@ export function createUserCommnand(data) {
       .replace(/\s/g, "")}@spcomponentes.com.br`,
     password: bcrypt.hashSync("teste123", 14),
     status: data.status,
-    isAdmin: data.role === 1 || false,
+    isAdmin: isUserAdmin(data.role),
     role: data.role,
   };
 
@@ -45,8 +45,16 @@ export function updateUserCommand(data) {
       .replace(/\s/g, "")}@spcomponentes.com.br`,
     status: data.status,
     role: data.role,
-    isAdmin: data.role === 1 || false,
+    isAdmin: isUserAdmin(data.role),
   };
 
   return user;
+}
+
+function isUserAdmin(role) {
+  if (role === 1 || role === "1") {
+    return true;
+  }
+
+  return false;
 }
