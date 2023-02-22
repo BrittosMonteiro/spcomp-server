@@ -1,5 +1,6 @@
 import {
   createInquiryItemCommand,
+  readInquiryItemAdminCommand,
   readInquiryItemCommand,
   updateInquiryItemCommand,
   updateInquiryItemPriceCommand,
@@ -74,6 +75,59 @@ export async function readInquiryItems(req, res) {
       if (docs) {
         for (let doc of docs) {
           const data = readInquiryItemCommand(doc);
+          items.unshift(data);
+        }
+        return successData(res, { level: 2, items });
+      } else {
+        return errorCouldNotLoad(res, "Inquiry item could not be loaded");
+      }
+    })
+    .catch((err) => {
+      return errorCouldNotLoad(res, err.message);
+    });
+}
+
+export async function readInquiryItemsAdmin(req, res) {
+  let items = [];
+
+  await InquiryModel.find()
+    .where("isDeleted")
+    .equals(false)
+    .populate({ path: "idUser", select: "_id, username" })
+    .populate({
+      path: "idItem",
+      populate: {
+        path: "idBrand",
+        select: "description",
+      },
+    })
+    .populate({
+      path: "idItem",
+      populate: {
+        path: "idEncap",
+        select: "description",
+      },
+    })
+    .populate({
+      path: "idItem",
+      populate: {
+        path: "idType",
+        select: "description",
+      },
+    })
+    .populate({
+      path: "idSupplier",
+      select: "_id, name",
+    })
+    .populate({
+      path: "idCustomer",
+      select: "_id, name",
+    })
+    .exec()
+    .then((docs) => {
+      if (docs) {
+        for (let doc of docs) {
+          const data = readInquiryItemAdminCommand(doc);
           items.unshift(data);
         }
         return successData(res, { level: 2, items });
