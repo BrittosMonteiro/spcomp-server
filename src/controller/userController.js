@@ -1,5 +1,8 @@
+import bcrypt from "bcryptjs";
+
 import {
   createUserCommnand,
+  readUserByIdCommand,
   readUserCommand,
   updateUserCommand,
 } from "../commands/userCommands.js";
@@ -7,6 +10,7 @@ import {
   created,
   errorNotFound,
   errorServiceUnavailable,
+  noContent,
   successData,
   successMessage,
 } from "../handlers/returns.js";
@@ -61,7 +65,7 @@ export async function readUserById(req, res) {
     .equals(false)
     .then((response) => {
       if (response) {
-        const user = readUserCommand(response);
+        const user = readUserByIdCommand(response);
         return successData(res, user);
       } else {
         return errorServiceUnavailable(res, "User could not be loaded");
@@ -87,6 +91,28 @@ export async function updateUser(req, res) {
     .catch((err) => {
       return errorNotFound(res, err.message);
     });
+}
+
+export async function updatePassword(req, res) {
+  const { idUser, newPassword, confirmNewPassword } = req.body;
+
+  if (newPassword === confirmNewPassword) {
+    await UserModel.findByIdAndUpdate(idUser, {
+      password: bcrypt.hashSync(newPassword, 14),
+    })
+      .then((responseUpdate) => {
+        if (responseUpdate) {
+          return successMessage(res, "Password updated");
+        } else {
+          return noContent(res, "Password could not be updated");
+        }
+      })
+      .catch((err) => {
+        return errorServiceUnavailable(res, err.message);
+      });
+  } else {
+    return noContent(res, "Passwords do not match");
+  }
 }
 
 export async function deleteUser(req, res) {

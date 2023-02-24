@@ -33,6 +33,16 @@ export function readUserCommand(doc) {
   return user;
 }
 
+export function readUserByIdCommand(doc) {
+  const user = {
+    name: doc.name,
+    surname: doc.surname,
+    email: doc.email,
+    username: doc.username,
+  };
+  return user;
+}
+
 export function updateUserCommand(data) {
   const user = {
     name: data.name,
