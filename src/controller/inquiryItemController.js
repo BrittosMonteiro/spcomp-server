@@ -6,6 +6,7 @@ import {
   updateInquiryItemPriceCommand,
 } from "../commands/inquiryItemCommands.js";
 import {
+  created,
   errorCouldNotLoad,
   errorServiceUnavailable,
   successData,
@@ -223,14 +224,22 @@ export async function updateInquiryItemStep(req, res) {
     });
 }
 
-export async function updateOrderInquiryItemStep(items, step) {
+export async function updateOrderInquiryItemStep(items, step, res) {
   await InquiryModel.updateMany(
     { _id: { $in: items } },
     { $set: { step: step } },
     { multi: true }
-  ).then(() => {
-    return;
-  });
+  )
+    .then((responseUpdate) => {
+      if (responseUpdate) {
+        return created(res, "Order created and step updated");
+      } else {
+        return errorServiceUnavailable(res, "Could not update step");
+      }
+    })
+    .catch((err) => {
+      return errorServiceUnavailable(res, err.message);
+    });
 }
 
 export async function deleteInquiryItem(req, res) {

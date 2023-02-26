@@ -44,18 +44,18 @@ export async function createOrderListItem(req, res) {
     .save()
     .then((responseCreate) => {
       if (responseCreate) {
-        updateOrderInquiryItemStep(itemsList, 5);
+        updateOrderInquiryItemStep(itemsList, 5, res);
       } else {
         return noContent(res, "Order could not be created");
       }
     })
-    .then((response) => {
-      if (response) {
-        return created(res, "Order created");
-      } else {
-        return errorCouldNotLoad(res, "Order could not be created");
-      }
-    })
+    // .then((response) => {
+    //   if (response) {
+    //     return created(res, "Order created");
+    //   } else {
+    //     return errorCouldNotLoad(res, "Order could not be created");
+    //   }
+    // })
     .catch((err) => {
       return errorServiceUnavailable(res, err.message);
     });

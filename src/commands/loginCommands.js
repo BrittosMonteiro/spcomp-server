@@ -5,6 +5,7 @@ export function loginCommand(data) {
     isAdmin: data.isAdmin,
     token: data._id,
     role: data.role,
+    id: data._id.toString(),
   };
 
   return loginData;
