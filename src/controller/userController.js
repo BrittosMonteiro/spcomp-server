@@ -115,6 +115,10 @@ export async function updatePassword(req, res) {
   }
 }
 
+export async function setUserLastTimeOnline(idUser) {
+  await UserModel.findByIdAndUpdate(idUser, { lastTimeOnline: Date.now() });
+}
+
 export async function deleteUser(req, res) {
   const { idUser } = req.body;
 

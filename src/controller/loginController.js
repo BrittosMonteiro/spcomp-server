@@ -8,6 +8,7 @@ import {
 import UserModel from "../model/userModel.js";
 import SupplierModel from "../model/supplierModel.js";
 import bcrypt from "bcryptjs";
+import { setUserLastTimeOnline } from "./userController.js";
 
 export async function loginUser(req, res) {
   const { username, password } = req.body;
@@ -21,6 +22,7 @@ export async function loginUser(req, res) {
       if (response) {
         const comparePass = bcrypt.compareSync(password, response.password);
         if (comparePass) {
+          setUserLastTimeOnline(response._id.toString());
           const userLogin = loginCommand(response);
           return successData(res, userLogin);
         } else {

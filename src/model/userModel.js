@@ -10,6 +10,8 @@ const userSchama = new mongoose.Schema({
   isAdmin: { type: Boolean, required: true },
   role: { type: Number, required: true },
   isDeleted: { type: Boolean, required: true, default: false },
+  isFirstTimeOnline: { type: Boolean, required: true, default: true },
+  lastTimeOnline: { type: Date },
 });
 
 const UserModel = mongoose.model("user", userSchama);

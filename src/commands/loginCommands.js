@@ -6,6 +6,7 @@ export function loginCommand(data) {
     token: data._id,
     role: data.role,
     id: data._id.toString(),
+    isFirstTimeOnline: data.isFirstTimeOnline,
   };
 
   return loginData;
