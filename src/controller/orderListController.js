@@ -44,7 +44,8 @@ export async function createOrderListItem(req, res) {
     .save()
     .then((responseCreate) => {
       if (responseCreate) {
-        updateOrderInquiryItemStep(itemsList, 5, res);
+        updateOrderInquiryItemStep(itemsList, 5);
+        return created(res, "Order created and step updated");
       } else {
         return noContent(res, "Order could not be created");
       }

@@ -224,22 +224,22 @@ export async function updateInquiryItemStep(req, res) {
     });
 }
 
-export async function updateOrderInquiryItemStep(items, step, res) {
+export async function updateOrderInquiryItemStep(items, step) {
   await InquiryModel.updateMany(
     { _id: { $in: items } },
     { $set: { step: step } },
     { multi: true }
-  )
-    .then((responseUpdate) => {
-      if (responseUpdate) {
-        return created(res, "Order created and step updated");
-      } else {
-        return errorServiceUnavailable(res, "Could not update step");
-      }
-    })
-    .catch((err) => {
-      return errorServiceUnavailable(res, err.message);
-    });
+  );
+  // .then((responseUpdate) => {
+  //   if (responseUpdate) {
+  //     return created(res, "Order created and step updated");
+  //   } else {
+  //     return errorServiceUnavailable(res, "Could not update step");
+  //   }
+  // })
+  // .catch((err) => {
+  //   return errorServiceUnavailable(res, err.message);
+  // });
 }
 
 export async function deleteInquiryItem(req, res) {
